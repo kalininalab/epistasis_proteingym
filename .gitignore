@@ -20,7 +20,6 @@ venv/
 
 # Data files
 data
-*.csv
 
 # Logs
 *.log
