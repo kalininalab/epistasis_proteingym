@@ -1,0 +1,27 @@
+Unnamed: 0,model,D7PM05_CLYGR_Somermeyer_2022_all,D7PM05_CLYGR_Somermeyer_2022_epistatic,Q6WV13_9MAXI_Somermeyer_2022_all,Q6WV13_9MAXI_Somermeyer_2022_epistatic,Q8WTC7_9CNID_Somermeyer_2022_all,Q8WTC7_9CNID_Somermeyer_2022_epistatic,category
+3,CARP_carp_76M_carp_76M_score,0.03,0.03,0.02,-0.04,-0.03,-0.02,CARP
+4,DeepSequence_evol_indices_seed_1000,-0.61,-0.44,-0.26,-0.16,-0.22,-0.15,DeepSequence
+23,ESM-IF1_esmif1_ll,0.51,0.38,0.3,0.28,0.29,0.27,ESM-IF1
+10,ESM1b_esm1b_t33_650M_UR50S,0.44,0.31,0.24,0.18,0.22,0.19,ESM1b
+15,ESM1v_esm1v_t33_650M_UR90S_5,0.07,0.05,0.04,-0.02,-0.03,-0.04,ESM1v
+18,ESM2_15B_esm2_t48_15B_UR50D,0.15,0.07,-0.02,-0.06,0.03,-0.01,ESM2
+25,EVE_evol_indices_seed_2000,-0.63,-0.45,-0.33,-0.22,-0.32,-0.26,EVE
+30,EVmutation_prediction_epistatic,0.63,0.45,0.39,0.29,0.37,0.27,EVmutation
+32,GEMME_GEMME_score,0.62,0.45,0.43,0.34,0.37,0.28,GEMME
+34,MIF_mifst_mifst_score,0.32,0.23,0.16,0.13,0.14,0.15,MIF
+40,MSA_Transformer_esm_msa1b_t12_100M_UR50S_ensemble,0.66,0.49,0.41,0.31,0.32,0.25,MSA
+41,MULAN_MULAN_small_MULAN_score,0.19,0.14,0.05,0.01,0.04,0.05,MULAN
+42,PoET_PoET_score,0.69,0.53,0.46,0.37,0.35,0.26,PoET
+52,ProSST_ProSST-4096_ProSST-4096,0.63,0.43,0.47,0.37,0.48,0.37,ProSST
+47,Progen2_xlarge_Progen2_score,0.36,0.18,-0.01,-0.07,0.27,0.16,Progen2
+55,ProtGPT2_ProtGPT2_score,0.02,0.01,0.04,0.06,-0.02,-0.03,ProtGPT2
+57,ProtSSN_ProtSSN_k20_h512,0.5,0.4,0.29,0.26,0.26,0.24,ProtSSN
+54,ProteinMPNN_pmpnn_ll,0.4,0.26,0.17,0.14,0.19,0.17,ProteinMPNN
+69,RITA_xlarge_RITA_score,0.08,0.05,0.1,0.04,0.01,0.0,RITA
+71,SaProt_SaProt_650M_AF2_SaProt_score,0.34,0.22,0.07,0.02,0.14,0.09,SaProt
+73,TranceptEVE_TranceptEVE_L_avg_score_R_to_L,0.62,0.43,0.32,0.21,0.36,0.27,TranceptEVE
+82,Tranception_Tranception_L_avg_score_R_to_L,0.53,0.34,0.24,0.16,0.33,0.23,Tranception
+103,UniRep_evotuned_Unirep_score,-0.48,-0.26,-0.12,-0.07,-0.3,-0.22,UniRep
+105,VESPA_VESPAl,0.57,0.46,0.35,0.32,0.31,0.25,VESPA
+106,VespaG_VespaG,0.6,0.45,0.36,0.31,0.3,0.25,VespaG
+107,Wavenet_Wavenet_prediction,-0.44,-0.3,-0.29,-0.26,-0.23,-0.2,Wavenet
