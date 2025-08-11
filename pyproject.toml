@@ -1,0 +1,15 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "epistasis-paper"
+version = "0.1.0"
+description = "Code and analysis for the epistasis prediction study"
+authors = [
+    {name="Anastasia Kolchina"}
+]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["src*"]

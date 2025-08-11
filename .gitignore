@@ -1,0 +1,25 @@
+.*
+!.gitignore
+!.pre-commit-config.yaml
+!.github/
+labjournal.md
+__*__
+
+# Byte-compiled / optimized / DLL files
+*.egg-info
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environment
+venv/
+.env/
+
+# Jupyter Notebooks
+.ipynb_checkpoints/
+
+# Data files
+data/
+
+# Logs
+*.log

@@ -1,0 +1,17 @@
+name: epi_env
+channels:
+  - defaults
+  - conda-forge
+  - pytorch
+dependencies:
+  - python=3.10.*
+  - pytorch
+  - torchvision
+  - numpy
+  - pandas
+  - scikit-learn
+  - scipy
+  - biopython
+  - matplotlib
+  - seaborn
+  - jupyter
