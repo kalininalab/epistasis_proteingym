@@ -54,6 +54,7 @@ cd <repo-name>
 Create the conda environment:
 ```bash
 conda env create -f environment.yml
+conda env create -f external/tsuboyama/protease-pipeline.yml 
 conda activate epistasis
 pip install ipykernel
 python -m ipykernel install --user --name=epi_env --display-name "Python (epi_env)"
@@ -73,6 +74,7 @@ DOWNLOAD:
 - zero_shot_substitutions_score/
 - amacGFP_cgreGFP_ppluGFP2__final_aminoacid_genotypes_to_brightness.csv
 - Tsuboyama2023_Dataset2_Dataset3_20230416.csv
+- protein_seqs.fa
 to data folder 
 TODO do it automatically (as people are stupid)
 
