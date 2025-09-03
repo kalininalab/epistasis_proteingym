@@ -3,6 +3,8 @@ from pathlib import Path
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
+from matplotlib.lines import Line2D
+import numpy as np
 from .utils import convert_name_to_gfp, convert_name_tsuboyama
 
 # for notebook 01
@@ -373,3 +375,138 @@ def tsuboyama_dotplot_grid(input_dir, out_dir, chunk_size=12, rows=4, cols=3, hi
 #         out_path = out_dir / f"part_{page_idx}.png"
 #         fig.savefig(out_path, dpi=300, bbox_inches="tight")
 #         plt.close(fig)
+
+
+# for notebook 03
+
+# def combined_plot(input_dir, output_dir):
+
+#     df = pd.read_csv(input_dir / 'somermeyer_best_models.csv', index_col=0)
+#     datasets = df.columns.str.replace('_all', '').str.replace('_epistatic', '').unique()
+
+#     for dataset in datasets:
+#         all_values = np.abs(df[dataset + '_all'])
+#         epistatic_values = np.abs(df[dataset + '_epistatic'])
+#         deltas = all_values - epistatic_values
+
+#         dataset_name = convert_name_to_gfp(dataset)
+
+#         df_temp = pd.DataFrame({
+#             'model': df.index,
+#             'all': all_values,
+#             'epistatic': epistatic_values,
+#             'delta': deltas
+#         }).reset_index(drop=True)
+
+#         df_temp['sort_key'] = df_temp['model'].apply(lambda x: 1 if x in ['Linear_regression', 'MLP'] else 0)
+#         df_temp = df_temp.sort_values(by=['sort_key', 'all'], ascending=[True, False])
+
+#         x = np.arange(len(df_temp))
+#         width = 0.4
+#         cmap = plt.get_cmap('Paired')
+
+#         fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(16, 12), sharex=True, gridspec_kw={'height_ratios': [2, 1]})
+
+#         # upper plot
+#         ax1.bar(x - width/2, df_temp['all'], width=width, color=cmap(0), label='All points')
+#         ax1.bar(x + width/2, df_temp['epistatic'], width=width, color=cmap(1), label='Epistatic points')
+#         ax1.set_ylabel('Spearman correlation', fontsize=14)
+#         ax1.set_title(f'Spearman correlation for {dataset_name}', fontsize=16)
+#         ax1.grid(True, axis='y')
+#         ax1.legend(loc='upper left', prop={'size': 12})
+#         ax1.tick_params(axis='y', labelsize=12)
+
+#         # lower plot: delta
+#         ax2.bar(x, df_temp['delta'], color='cornflowerblue')
+#         ax2.set_ylabel('Δ (All - Epistatic)', fontsize=14)
+#         ax2.grid(True, axis='y')
+#         ax2.tick_params(axis='y', labelsize=12)
+
+#         # common ax
+#         ax2.set_xticks(x)
+#         ax2.set_xticklabels(
+#             [f"$\\bf{{{m}}}$" if m in ['Linear_regression', 'MLP'] else m for m in df_temp['model']],
+#             fontsize=12,
+#             rotation=90
+#         )
+#         ax2.set_xlabel('Model', fontsize=14)
+
+#         plt.tight_layout()
+#         plt.savefig(output_dir / f'2_combined_plot_{dataset_name}.png', bbox_inches='tight')
+#         plt.close()
+
+def combined_plot(input_dir, output_dir):
+    df = pd.read_csv(input_dir / 'somermeyer_best_models.csv', index_col=0)
+    datasets = df.columns.str.replace('_all', '', regex=False).str.replace('_epistatic', '', regex=False).unique()
+
+    for dataset in datasets:
+        all_values = np.abs(df[dataset + '_all'].astype(float))
+        epistatic_values = np.abs(df[dataset + '_epistatic'].astype(float))
+        deltas = all_values - epistatic_values
+
+        dataset_name = convert_name_to_gfp(dataset)
+
+        df_temp = pd.DataFrame({
+            'model': df.index,
+            'all': all_values,
+            'epistatic': epistatic_values,
+            'delta': deltas
+        }).reset_index(drop=True)
+
+        # sort: baselines first, then by 'all' desc
+        df_temp['sort_key'] = df_temp['model'].apply(lambda x: 1 if x in ['Linear_regression', 'MLP'] else 0)
+        df_temp = df_temp.sort_values(by=['sort_key', 'all'], ascending=[True, False])
+
+        x = np.arange(len(df_temp))
+        width = 0.4
+        cmap = plt.get_cmap('Paired')
+
+        fig, (ax1, ax2) = plt.subplots(
+            2, 1, figsize=(16, 12), sharex=True,
+            gridspec_kw={'height_ratios': [2, 1]}
+        )
+
+        # ---- upper plot: bars ----
+        bar_all = ax1.bar(x - width/2, df_temp['all'],       width=width, color=cmap(0), label='All points')
+        bar_epi = ax1.bar(x + width/2, df_temp['epistatic'], width=width, color=cmap(1), label='Epistatic points')
+
+        ax1.set_ylabel('Spearman correlation', fontsize=14)
+        ax1.set_title(f'Spearman correlation for {dataset_name}', fontsize=16)
+        ax1.grid(True, axis='y')
+        ax1.tick_params(axis='y', labelsize=12)
+
+        # ---- medians (black lines) ----
+        med_all = float(np.nanmedian(df_temp['all'].values))
+        med_epi = float(np.nanmedian(df_temp['epistatic'].values))
+
+        line_all = ax1.axhline(med_all, color='black', linestyle='-', linewidth=1.8)
+        line_epi = ax1.axhline(med_epi, color='black', linestyle=':', linewidth=1.8)
+
+        # Legend: include bars + median lines
+        custom_handles = [
+            bar_all.patches[0],  # proxy for "All points" bars
+            bar_epi.patches[0],  # proxy for "Epistatic points" bars
+            Line2D([0], [0], color='black', linestyle='-', linewidth=1.8),  # median all
+            Line2D([0], [0], color='black', linestyle=':', linewidth=1.8),  # median epi
+        ]
+        custom_labels = ['All points', 'Epistatic points', 'Median (all)', 'Median (epistatic)']
+        ax1.legend(custom_handles, custom_labels, loc='upper left', prop={'size': 12})
+
+        # ---- lower plot: delta ----
+        ax2.bar(x, df_temp['delta'], color='cornflowerblue')
+        ax2.set_ylabel('Δ (All - Epistatic)', fontsize=14)
+        ax2.grid(True, axis='y')
+        ax2.tick_params(axis='y', labelsize=12)
+
+        # ---- common x labels ----
+        ax2.set_xticks(x)
+        ax2.set_xticklabels(
+            [f"$\\bf{{{m}}}$" if m in ['Linear_regression', 'MLP'] else m for m in df_temp['model']],
+            fontsize=12,
+            rotation=90
+        )
+        ax2.set_xlabel('Model', fontsize=14)
+
+        plt.tight_layout()
+        plt.savefig(output_dir / f'2_combined_plot_{dataset_name}.png', bbox_inches='tight', dpi=300)
+        plt.close()

@@ -8,9 +8,11 @@ from pathlib import Path
 from sklearn.preprocessing import FunctionTransformer
 from Bio import SeqIO
 import matplotlib.pyplot as plt
+from scipy.stats import spearmanr
 from .data_processing import table_parser, genotype_to_seq
 from .plotting import dotplot_triplet, tsuboyama_dotplot_single
-from .utils import convert_name_tsuboyama
+from .utils import convert_name_tsuboyama, convert_name_to_gfp, shift_mutation_positions_up
+from .constants import SEED
 
 def epistasis_detection_somermeyer(input_dir, output_dir, N=1):
     file_path = os.path.join(input_dir, "amacGFP_cgreGFP_ppluGFP2__final_nucleotide_genotypes_to_brightness.csv")
@@ -246,3 +248,94 @@ def explore_N_values_tsuboyama(input_dir, output_dir, filename=None, pattern="*.
     plt.tight_layout()
     fig.savefig(output_dir / "3_Tsuboyama_N_explored.png", dpi=300, bbox_inches="tight")
     plt.close(fig)
+    
+# for notebook 03    
+    
+def compute_result_table(model_dir, epi_dir, dataset_name):
+    input_dir = model_dir / dataset_name
+    # Open 1 dataset just to get model names
+    file_path = next(input_dir.glob("*.csv"))
+    df = pd.read_csv(file_path)
+    df["num_mutations"] = df["mutant"].apply(lambda x: len(x.split(":")))
+    singles = df[df['num_mutations'] == 1].copy()
+    model_columns = list(singles.columns)
+    values_to_remove = ['mutant', 'mutated_sequence', 'DMS_score', 'DMS_score_bin', 'num_mutations']
+    model_columns = [x for x in model_columns if x not in values_to_remove]
+    model_columns.extend(["Linear_regression", "MLP"])
+    cols = []
+
+    for file_path in input_dir.glob("*.csv"): # iterate over datasets
+        df = pd.read_csv(file_path)
+        dataset = file_path.stem
+        cols.append(dataset + '_all')
+        cols.append(dataset + '_epistatic')
+    result_all = pd.DataFrame(index=model_columns, columns=cols)
+
+    for file_path in input_dir.glob("*.csv"): # iterate over datasets
+        df = pd.read_csv(file_path)
+        df["num_mutations"] = df["mutant"].apply(lambda x: len(x.split(":")))
+        singles = df[df['num_mutations'] == 1].copy()
+        multis = df[df['num_mutations'] > 1].copy()
+        dataset = file_path.stem
+        
+        if dataset_name == "somermeyer":
+            selected = pd.read_csv(epi_dir / f"{convert_name_to_gfp(dataset)}.csv")
+            selected.rename(columns={"aa_genotype": "mutant"}, inplace=True)
+            selected['mutant'] = selected['mutant'].apply(shift_mutation_positions_up)
+        else:
+            selected = pd.read_csv(epi_dir / file_path.name)
+        
+        selected = selected[['mutant', 'epistatic']]
+        multis = multis.merge(selected, on='mutant', how='left')
+        epistatic = multis[multis["epistatic"].notna() & multis["epistatic"]]
+        
+        if len(epistatic) == 0: # no epistasis detected for the dataset
+            result_all.drop(columns=[dataset + '_all', dataset + '_epistatic'], inplace=True)
+            continue
+
+        values_to_remove = ["Linear_regression", "MLP"]
+        model_columns = [x for x in model_columns if x not in values_to_remove]
+        for model in model_columns: # calculate for all model predictions
+            spearman_epistatic = spearmanr(epistatic["DMS_score"], epistatic[model])[0]
+
+            result_all.loc[model, dataset + '_epistatic'] = f"{spearman_epistatic:.2f}"
+            # sample as the same size as epistatic points
+            sample = multis.sample(n=len(epistatic), random_state=SEED)
+            spearman_all = spearmanr(sample['DMS_score'], sample[model])[0]
+            result_all.loc[model, dataset + '_all'] = f"{spearman_all:.2f}"
+    
+    return result_all
+
+
+def select_best_models(dir, dataset_name):
+    # Load CSV with model names as index
+    data = pd.read_csv(dir / f"{dataset_name}_all_models.csv", index_col=0)
+
+    # Fill missing values with 0
+    data.fillna(0, inplace=True)
+
+    # Pick columns that end with '_all' to compute mean scores
+    columns_to_consider = [col for col in data.columns if col.endswith('_all')]
+
+    # Create a new column for category (e.g. "MLP_v2" → "MLP")
+    data['category'] = data.index.to_series().str.split(r'[_-]').str[0]
+
+    # Prepare list to collect best models
+    best_rows = []
+
+    # For each category, find the best full model (by mean(abs(...)))
+    for category, group in data.groupby('category'):
+        # Find model name (i.e. index) with highest mean score
+        best_model_name = group[columns_to_consider].abs().mean(axis=1).idxmax()
+        best_row = data.loc[best_model_name].copy()
+        best_row.name = best_model_name  # ensure full model name is preserved
+        best_rows.append(best_row)
+
+    # Combine best rows into a new DataFrame
+    best_models_df = pd.DataFrame(best_rows)
+
+    # Drop the helper column if you don't want it
+    best_models_df.drop(columns=['category'], inplace=True)
+
+    # Save final result
+    best_models_df.to_csv(dir / f"{dataset_name}_best_models.csv", index=True)
