@@ -5,7 +5,7 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 from matplotlib.lines import Line2D
 import numpy as np
-from .utils import convert_name_to_gfp, convert_name_tsuboyama
+from .utils import convert_name_to_gfp, convert_name_tsuboyama, extract_dataset_name
 
 # for notebook 01
 
@@ -161,7 +161,7 @@ def dotplot_single(ax, file_path, title, hist=False):
         # Bar plot for counts of x and epi_x
         counts = [len(x), len(epi_x)]
         bar_labels = [len(x), len(epi_x)]
-        bar_colors = [cmap(1), cmap(0)]
+        bar_colors = [cmap(0), cmap(1)]
         # Position the bar plot in the right bottom corner
         inset_ax = ax.inset_axes([0.75, 0.05, 0.2, 0.2])
         inset_ax.bar(range(len(bar_labels)), counts, color=bar_colors, alpha=0.8)
@@ -435,7 +435,7 @@ def tsuboyama_dotplot_grid(input_dir, out_dir, chunk_size=12, rows=4, cols=3, hi
 #         plt.savefig(output_dir / f'2_combined_plot_{dataset_name}.png', bbox_inches='tight')
 #         plt.close()
 
-def combined_plot(input_dir, output_dir):
+def combined_plot_somermeyer(input_dir, output_dir):
     df = pd.read_csv(input_dir / 'somermeyer_best_models.csv', index_col=0)
     datasets = df.columns.str.replace('_all', '', regex=False).str.replace('_epistatic', '', regex=False).unique()
 
@@ -479,15 +479,15 @@ def combined_plot(input_dir, output_dir):
         med_all = float(np.nanmedian(df_temp['all'].values))
         med_epi = float(np.nanmedian(df_temp['epistatic'].values))
 
-        line_all = ax1.axhline(med_all, color='black', linestyle='-', linewidth=1.8)
-        line_epi = ax1.axhline(med_epi, color='black', linestyle=':', linewidth=1.8)
+        line_all = ax1.axhline(med_all, color='red', linestyle='-', linewidth=1.8)
+        line_epi = ax1.axhline(med_epi, color='green', linestyle='-', linewidth=1.8)
 
         # Legend: include bars + median lines
         custom_handles = [
             bar_all.patches[0],  # proxy for "All points" bars
             bar_epi.patches[0],  # proxy for "Epistatic points" bars
-            Line2D([0], [0], color='black', linestyle='-', linewidth=1.8),  # median all
-            Line2D([0], [0], color='black', linestyle=':', linewidth=1.8),  # median epi
+            Line2D([0], [0], color='red', linestyle='-', linewidth=1.8),  # median all
+            Line2D([0], [0], color='green', linestyle='-', linewidth=1.8),  # median epi
         ]
         custom_labels = ['All points', 'Epistatic points', 'Median (all)', 'Median (epistatic)']
         ax1.legend(custom_handles, custom_labels, loc='upper left', prop={'size': 12})
@@ -509,4 +509,188 @@ def combined_plot(input_dir, output_dir):
 
         plt.tight_layout()
         plt.savefig(output_dir / f'2_combined_plot_{dataset_name}.png', bbox_inches='tight', dpi=300)
+        plt.close()
+        
+
+def combined_plot_tsuboyama(input_dir, output_dir, N=None):
+    df_models = pd.read_csv(input_dir / "models_evaluation" / "tsuboyama_best_models.csv", index_col=0)
+    # Drop baselines if you don’t want them in the boxplot
+    df_models.drop(labels=["MLP", "Linear_regression"], axis=0, inplace=True) 
+    df_counts = pd.read_csv(input_dir / "counts.csv", index_col=0)
+
+    # Split all vs epistatic
+    df_all = np.abs(df_models.filter(like="_all")).copy()
+    df_epi = np.abs(df_models.filter(like="_epistatic")).copy()
+
+    # Harmonize column names
+    df_all.columns = [extract_dataset_name(c) for c in df_all.columns]
+    df_epi.columns = [extract_dataset_name(c) for c in df_epi.columns]
+
+    # Keep only datasets present in both
+    common_cols = sorted(set(df_all.columns) & set(df_epi.columns))
+    df_all = df_all[common_cols]
+    df_epi = df_epi[common_cols]
+
+    # Drop empty datasets
+    non_empty_cols = [
+        col for col in common_cols
+        if not (df_all[col].fillna(0).eq(0).all() or df_epi[col].fillna(0).eq(0).all())
+    ]
+    df_all = df_all[non_empty_cols]
+    df_epi = df_epi[non_empty_cols]
+
+    # Order by median of "all"
+    # median_order = df_all.median().sort_values(ascending=False).index.tolist()
+    # df_all = df_all[median_order]
+    # df_epi = df_epi[median_order]
+
+    # Long format for seaborn
+    df_all_melt = df_all.melt(var_name="Model", value_name="Spearman")
+    df_all_melt["Point type"] = "All points"
+    df_epi_melt = df_epi.melt(var_name="Model", value_name="Spearman")
+    df_epi_melt["Point type"] = "Epistatic points"
+    df_plot = pd.concat([df_all_melt, df_epi_melt], ignore_index=True)
+    
+    # df_plot["Model"] = pd.Categorical(df_plot["Model"], categories=median_order, ordered=True)
+
+    # Counts bar (align columns)
+    df_counts.columns = [extract_dataset_name(c) for c in df_counts.columns]
+    df_counts = df_counts[non_empty_cols]
+
+    fig, (ax1, ax2) = plt.subplots(
+        2, 1, figsize=(21, 8),
+        gridspec_kw={"height_ratios": [3, 1]},
+        sharex=True
+    )
+
+    # ----- Boxplot
+    hue_order = ["All points", "Epistatic points"]
+    palette = plt.get_cmap("Paired").colors[:2]
+
+    sns.boxplot(
+        data=df_plot,
+        x="Model",
+        y="Spearman",
+        hue="Point type",
+        hue_order=hue_order,
+        palette=palette,
+        dodge=True,
+        width=0.6,
+        linewidth=1,
+        ax=ax1
+    )
+
+    # ----- Global median lines
+    all_median = df_plot[df_plot["Point type"] == "All points"]["Spearman"].median()
+    epi_median = df_plot[df_plot["Point type"] == "Epistatic points"]["Spearman"].median()
+
+    for line in ax1.lines:
+        if ax1.lines.index(line) % 6 == 4:
+            line.set_linewidth(3)
+            line.set_color('black')
+            
+    ax1.axhline(all_median, color="red", linestyle="-", linewidth=2.5, label="Median (all)")
+    ax1.axhline(epi_median, color="green", linestyle="-", linewidth=2.5, label="Median (epistatic)")
+
+    # ----- Legend
+    handles, labels = ax1.get_legend_handles_labels()
+    ax1.legend(handles, labels)
+
+    # ----- Counts bar plot
+    ax2.grid(axis="y")
+    ax2.bar(df_counts.columns, list(df_counts.loc["counts", :]))
+    ax2.set_ylabel("Number of points", fontsize=12)
+    ax2.set_xlabel("Dataset", fontsize=14)
+
+    # ----- Labels / titles
+    ax1.set_ylabel("Spearman correlation", fontsize=14)
+    if N is not None:
+        ax1.set_title(f"Boxplot of all vs. epistatic points across models (Tsuboyama datasets, N={N})", fontsize=16)
+    else:
+        ax1.set_title("Boxplot of all vs. epistatic points across models (Tsuboyama datasets)", fontsize=16)
+    ax1.grid(axis="y")
+
+    plt.xticks(rotation=90)
+    plt.tight_layout()
+    plt.savefig(output_dir / "3_tsuboyama_combined_plot.png", bbox_inches="tight", dpi=300)
+    plt.close()
+
+
+def individual_combined_plot_tsuboyama(input_dir, output_dir):
+    df = pd.read_csv(input_dir / "models_evaluation" / "tsuboyama_best_models.csv", index_col=0)
+    datasets = df.columns.str.replace('_all', '', regex=False).str.replace('_epistatic', '', regex=False).unique()
+    df_counts = pd.read_csv(input_dir / "counts.csv", index_col=0)
+
+    for dataset in datasets:
+        if df_counts.at["counts", dataset] < 400:
+            continue
+        all_values = np.abs(df[dataset + '_all'].astype(float))
+        epistatic_values = np.abs(df[dataset + '_epistatic'].astype(float))
+        deltas = all_values - epistatic_values
+
+        dataset_name = convert_name_tsuboyama(dataset)
+
+        df_temp = pd.DataFrame({
+            'model': df.index,
+            'all': all_values,
+            'epistatic': epistatic_values,
+            'delta': deltas
+        }).reset_index(drop=True)
+
+        # sort: baselines first, then by 'all' desc
+        df_temp['sort_key'] = df_temp['model'].apply(lambda x: 1 if x in ['Linear_regression', 'MLP'] else 0)
+        df_temp = df_temp.sort_values(by=['sort_key', 'all'], ascending=[True, False])
+
+        x = np.arange(len(df_temp))
+        width = 0.4
+        cmap = plt.get_cmap('Paired')
+
+        fig, (ax1, ax2) = plt.subplots(
+            2, 1, figsize=(16, 12), sharex=True,
+            gridspec_kw={'height_ratios': [2, 1]}
+        )
+
+        # ---- upper plot: bars ----
+        bar_all = ax1.bar(x - width/2, df_temp['all'],       width=width, color=cmap(0), label='All points')
+        bar_epi = ax1.bar(x + width/2, df_temp['epistatic'], width=width, color=cmap(1), label='Epistatic points')
+
+        ax1.set_ylabel('Spearman correlation', fontsize=14)
+        ax1.set_title(f'Spearman correlation for {dataset_name}', fontsize=16)
+        ax1.grid(True, axis='y')
+        ax1.tick_params(axis='y', labelsize=12)
+
+        # ---- medians (black lines) ----
+        med_all = float(np.nanmedian(df_temp['all'].values))
+        med_epi = float(np.nanmedian(df_temp['epistatic'].values))
+
+        line_all = ax1.axhline(med_all, color='red', linestyle='-', linewidth=1.8)
+        line_epi = ax1.axhline(med_epi, color='green', linestyle='-', linewidth=1.8)
+
+        # Legend: include bars + median lines
+        custom_handles = [
+            bar_all.patches[0],  # proxy for "All points" bars
+            bar_epi.patches[0],  # proxy for "Epistatic points" bars
+            Line2D([0], [0], color='red', linestyle='-', linewidth=1.8),  # median all
+            Line2D([0], [0], color='green', linestyle='-', linewidth=1.8),  # median epi
+        ]
+        custom_labels = ['All points', 'Epistatic points', 'Median (all)', 'Median (epistatic)']
+        ax1.legend(custom_handles, custom_labels, loc='upper left', prop={'size': 12})
+
+        # ---- lower plot: delta ----
+        ax2.bar(x, df_temp['delta'], color='cornflowerblue')
+        ax2.set_ylabel('Δ (All - Epistatic)', fontsize=14)
+        ax2.grid(True, axis='y')
+        ax2.tick_params(axis='y', labelsize=12)
+
+        # ---- common x labels ----
+        ax2.set_xticks(x)
+        ax2.set_xticklabels(
+            [f"$\\bf{{{m}}}$" if m in ['Linear_regression', 'MLP'] else m for m in df_temp['model']],
+            fontsize=12,
+            rotation=90
+        )
+        ax2.set_xlabel('Model', fontsize=14)
+
+        plt.tight_layout()
+        plt.savefig(output_dir / f'4_combined_plot_{dataset_name}.png', bbox_inches='tight', dpi=300)
         plt.close()

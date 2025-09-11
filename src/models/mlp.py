@@ -85,7 +85,7 @@ def evaluate_on_test_sets(model, x_test, y_test, device="cpu", log_target=True):
     return rho
 
 
-def mlp(result_all, model_dir, epi_dir, dataset_name, seeds=5):
+def mlp(result_all, model_dir, epi_dir, dataset_name, seeds=5, seed_provided=None, dataset_set=None):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     # Load training data
     input_dir = model_dir / dataset_name
@@ -95,6 +95,9 @@ def mlp(result_all, model_dir, epi_dir, dataset_name, seeds=5):
         singles = df[df['num_mutations'] == 1].copy()
         multis = df[df['num_mutations'] > 1].copy()
         dataset = file_path.stem
+        
+        if dataset_set is not None and dataset not in dataset_set:
+            continue
         
         if dataset_name == "somermeyer":
             selected = pd.read_csv(epi_dir / f"{convert_name_to_gfp(dataset)}.csv")
@@ -120,6 +123,8 @@ def mlp(result_all, model_dir, epi_dir, dataset_name, seeds=5):
         spearman_epistatic = []
         for seed in range(seeds):
             # sample as the same size as epistatic points
+            if seeds == 1 and seed_provided is not None:
+                seed = seed_provided
             set_seed(seed)
             sample = multis.sample(n=len(epistatic), random_state=seed)
             seqs_all = sample['mutated_sequence'].apply(lambda x: x.rstrip('*')).tolist()
@@ -175,7 +180,7 @@ def mlp(result_all, model_dir, epi_dir, dataset_name, seeds=5):
                     log_target=log_target
             ))
             
-        result_all.loc["MLP", dataset + '_all'] = f"{np.mean(spearman_all):.2f}"
-        result_all.loc["MLP", dataset + '_epistatic'] = f"{np.mean(spearman_epistatic):.2f}"
+        result_all.loc["MLP", dataset + '_all'] = float(np.mean(spearman_all))
+        result_all.loc["MLP", dataset + '_epistatic'] = float(np.mean(spearman_epistatic))
 
     return result_all

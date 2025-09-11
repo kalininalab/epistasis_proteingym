@@ -15,6 +15,10 @@ def convert_name_tsuboyama(csv_path: Path) -> str:
     return Path(csv_path).stem
 
 
+def extract_dataset_name(col: str) -> str:
+        return "_".join(col.split("_")[:2])
+
+
 def shift_mutation_positions_up(mutant_str):
     if pd.isna(mutant_str):
         return mutant_str

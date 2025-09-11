@@ -6,10 +6,8 @@ from sklearn import preprocessing
 from src.constants import set_seed
 from src.utils import convert_name_to_gfp, shift_mutation_positions_up
 
-# Set random seed for reproducibility
-set_seed()
 
-def linear_regression(result_all, model_dir, epi_dir, dataset_name, seeds=5):
+def linear_regression(result_all, model_dir, epi_dir, dataset_name, seeds=5, seed_provided=None, dataset_set=None):
     input_dir = model_dir / dataset_name
     for file_path in input_dir.glob("*.csv"): # iterate over datasets
         df = pd.read_csv(file_path)
@@ -17,6 +15,9 @@ def linear_regression(result_all, model_dir, epi_dir, dataset_name, seeds=5):
         singles = df[df['num_mutations'] == 1].copy()
         multis = df[df['num_mutations'] > 1].copy()
         dataset = file_path.stem
+        
+        if dataset_set is not None and dataset not in dataset_set:
+            continue
                 
         if dataset_name == "somermeyer":
             selected = pd.read_csv(epi_dir / f"{convert_name_to_gfp(dataset)}.csv")
@@ -42,6 +43,8 @@ def linear_regression(result_all, model_dir, epi_dir, dataset_name, seeds=5):
         spearman_epistatic = []
         for seed in range(seeds):
             # sample as the same size as epistatic points
+            if seeds == 1 and seed_provided is not None:
+                seed = seed_provided
             sample = multis.sample(n=len(epistatic), random_state=seed)
             seqs_all = sample['mutated_sequence'].apply(lambda x: x.rstrip('*')).tolist()
             y_test_all = np.array(sample['DMS_score'])
@@ -83,7 +86,7 @@ def linear_regression(result_all, model_dir, epi_dir, dataset_name, seeds=5):
                 y_pred_epistatic = np.expm1(y_pred_epistatic)
             spearman_epistatic.append(spearmanr(y_pred_epistatic, y_test_epistatic)[0])
 
-        result_all.loc["Linear_regression", dataset + '_all'] = f"{np.mean(spearman_all):.2f}"
-        result_all.loc["Linear_regression", dataset + '_epistatic'] = f"{np.mean(spearman_epistatic):.2f}"
-        
+        result_all.loc["Linear_regression", dataset + '_all'] = float(np.mean(spearman_all))
+        result_all.loc["Linear_regression", dataset + '_epistatic'] = float(np.mean(spearman_epistatic))
+
     return result_all

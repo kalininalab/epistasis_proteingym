@@ -1,0 +1,11 @@
+Dataset,Top-1,Top-2,Top-3,Top-4,Top-5
+AMFR_HUMAN_4G3O,Linear_regression,MLP,SaProt_35M_AF2,Site_Independent,ProSST-2048
+EPHB2_HUMAN_1F0M,Linear_regression,MLP,VespaG,MULAN_small,Site_Independent
+FECA_ECOLI_2D1U,Linear_regression,MLP,EVmutation,MULAN_small,ESM1v_single
+HECD1_HUMAN_3DKM,MLP,Linear_regression,Progen2_base,Wavenet,TranceptEVE_M
+MYO3_YEAST_2BTT,Linear_regression,MLP,ProSST-2048,VenusREM,ESMC-600M
+OBSCN_HUMAN_1V1C,ProSST-2048,MLP,Linear_regression,VenusREM,ESMC-600M
+POLG_PESV_2MXD,ProSST-2048,MLP,Linear_regression,SaProt_35M_AF2,S3F
+SPTN1_CHICK_1TUD,MLP,Linear_regression,S3F,VESPA,S2F_MSA
+UBE4B_HUMAN_3L1X,Linear_regression,MLP,MIF,ESM3,GEMME
+YAIA_ECOLI_2KVT,Progen3_112m,Linear_regression,MLP,ESM2_35M,CARP_38M
