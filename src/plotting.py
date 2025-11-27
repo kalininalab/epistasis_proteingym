@@ -87,7 +87,7 @@ def mut_hist_tsuboyama(tsuboyama_data_dir, save_path=None):
 
 
 def val_hist_somermeyer(somermeyer_data_dir, save_path=None):
-    plt.figure(figsize=(8, 6))
+    plt.figure(figsize=(6, 6))
 
     for file in Path(somermeyer_data_dir).glob("*.csv"):
         df = pd.read_csv(file)
@@ -694,3 +694,324 @@ def individual_combined_plot_tsuboyama(input_dir, output_dir):
         plt.tight_layout()
         plt.savefig(output_dir / f'4_combined_plot_{dataset_name}.png', bbox_inches='tight', dpi=300)
         plt.close()
+        
+        
+def _hist_mode(x, bins=70):
+    """Histogram-based mode (bin center with max count)."""
+    if len(x) == 0:
+        return None
+    counts, edges = np.histogram(x, bins=bins)
+    i = np.argmax(counts)
+    return 0.5 * (edges[i] + edges[i+1])
+
+def _overlay_fit(ax, x, color, method="kde", label=None, bins=70):
+    """
+    Draw a smooth density curve on top of the histogram.
+    method: 'kde' (preferred), 'gaussian', or None
+    """
+    if len(x) == 0 or method is None:
+        return
+
+    x = np.asarray(x)
+    x = x[np.isfinite(x)]
+    if len(x) == 0:
+        return
+
+    xx = np.linspace(x.min(), x.max(), 300)
+
+    if method == "kde":
+        # try scipy KDE, otherwise fallback to smoothed histogram
+        try:
+            from scipy.stats import gaussian_kde
+            kde = gaussian_kde(x)
+            yy = kde(xx)
+        except Exception:
+            # normalized histogram -> simple interpolation
+            h, edges = np.histogram(x, bins=bins, density=True)
+            centers = 0.5 * (edges[:-1] + edges[1:])
+            yy = np.interp(xx, centers, h)
+    elif method == "gaussian":
+        # fit a normal N(mu, sigma)
+        mu = np.mean(x)
+        sigma = np.std(x)
+        if sigma <= 0:
+            return
+        coef = 1.0 / (np.sqrt(2*np.pi) * sigma)
+        yy = coef * np.exp(-0.5 * ((xx - mu) / sigma)**2)
+    else:
+        return
+
+    ax.plot(xx, yy, lw=2, color=color, alpha=0.9, label=label)
+    
+    
+def tsuboyama_epi_single(
+    ax,
+    csv_path,
+    title=None,
+    hist=False,
+    bins=70,
+    show_modes=True,
+    fit=None,  # None | "kde" | "gaussian"
+    density=True,
+    right_limit=5
+):
+    df = pd.read_csv(csv_path)
+
+    epi_x  = np.abs(df[df["epistatic"] == True]["thermodynamic_coupling"].values)
+    non_x  = np.abs(df[df["epistatic"] == False]["thermodynamic_coupling"].values)
+
+    cmap = plt.get_cmap("Paired")
+
+    # Plot histograms as DENSITY so the curves align in scale
+    bins = np.linspace(0, max(epi_x.max() if len(epi_x) else 0, non_x.max() if len(non_x) else 0), 70)
+
+    # Combined distribution (epi + non-epi) in gray
+    try:
+        all_x = np.concatenate([epi_x, non_x])
+    except Exception:
+        all_x = epi_x if len(epi_x) else non_x
+    if len(all_x):
+        ax.hist(all_x, bins=bins, density=density, color="black", alpha=0.8, label="all")
+
+    # Class-specific histograms
+    if len(epi_x):
+        ax.hist(epi_x, bins=bins, density=density, color="sandybrown", alpha=0.5, label="epistasis")
+    if len(non_x):
+        ax.hist(non_x, bins=bins, density=density, color=cmap(1), alpha=0.5, label="no epistasis")
+
+    # Optional fitted curves
+    _overlay_fit(ax, epi_x, color="sandybrown", method=fit, label=("epi fit" if fit else None), bins=bins)
+    _overlay_fit(ax, non_x, color=cmap(1), method=fit, label=("non-epi fit" if fit else None), bins=bins)
+
+    # Optional mode markers (separate for epi/non-epi)
+    if show_modes:
+        m_epi = _hist_mode(epi_x, bins=bins)
+        m_non = _hist_mode(non_x, bins=bins)
+        if m_epi is not None:
+            ax.axvline(m_epi, color="sandybrown", ls="--", lw=2, alpha=0.9)
+            ax.text(m_epi, ax.get_ylim()[1]*0.9, "mode (epi)", color="sandybrown", ha="center", va="top", fontsize=10)
+        if m_non is not None:
+            ax.axvline(m_non, color=cmap(1), ls="--", lw=2, alpha=0.9)
+            ax.text(m_non, ax.get_ylim()[1]*0.82, "mode (non-epi)", color=cmap(1), ha="center", va="top", fontsize=10)
+
+    # Inset count bar (still shows absolute counts)
+    if hist:
+        counts = [len(non_x), len(epi_x)]
+        bar_colors = [cmap(1), "sandybrown"]
+        inset_ax = ax.inset_axes([0.74, 0.08, 0.22, 0.22])
+        inset_ax.bar([0, 1], counts, color=bar_colors, alpha=0.8)
+        inset_ax.set_xticks([0, 1])
+        inset_ax.set_xticklabels([str(c) for c in counts], fontsize=12)
+        inset_ax.get_yaxis().set_visible(False)
+        inset_ax.set_title("Sequence count", fontsize=11)
+        inset_ax.tick_params(axis="both", which="major", labelsize=11)
+        ax.legend(loc="upper right", fontsize=12)
+    else:
+        ax.legend(fontsize=12)
+
+    ax.set_title(title or convert_name_tsuboyama(csv_path), fontsize=16)
+    ax.set_xlabel("|Thermodynamic coupling|", fontsize=14)
+    if density:
+        ax.set_ylabel("Density", fontsize=14)  
+    else:
+        ax.set_ylabel("Counts", fontsize=14)
+    ax.set_xlim(right=right_limit)
+    ax.grid(True)
+
+
+def tsuboyama_epi_distribution_plots(
+    input_dir,
+    output_dir,
+    chunk_size=12,
+    rows=4,
+    cols=3,
+    hist=True,
+    bins=70,
+    show_modes=True,
+    fit=None  # None | "kde" | "gaussian"
+):
+    output_dir = Path(output_dir); output_dir.mkdir(parents=True, exist_ok=True)
+    files = sorted(Path(input_dir).glob("*.csv"))
+    pages = [files[i:i+chunk_size] for i in range(0, len(files), chunk_size)]
+
+    for page_idx, page_files in enumerate(pages):
+        fig, axes = plt.subplots(nrows=rows, ncols=cols, figsize=(30, 20))
+        axes = np.asarray(axes).reshape(rows, cols)
+
+        for k, csv_path in enumerate(page_files):
+            r, c = divmod(k, cols)
+            tsuboyama_epi_single(
+                axes[r, c],
+                csv_path,
+                title=convert_name_tsuboyama(csv_path),
+                hist=hist,
+                bins=bins,
+                show_modes=show_modes,
+                fit=fit
+            )
+
+        # hide unused axes on the last page
+        for k in range(len(page_files), rows * cols):
+            r, c = divmod(k, cols)
+            axes[r, c].axis("off")
+
+        plt.tight_layout()
+        out_path = Path(output_dir) / f"part_{page_idx}.png"
+        fig.savefig(out_path, dpi=300, bbox_inches="tight")
+        plt.close(fig)
+        
+# trash
+
+def _auto_grid(n):
+    if n == 0:
+        return 1, 1
+    cols = int(np.ceil(np.sqrt(n)))
+    rows = int(np.ceil(n / cols))
+    return rows, cols
+
+def _collect_files_by_epi(input_dir, min_epi=None, max_epi=None):
+    files = sorted(Path(input_dir).glob("*.csv"))
+    keep = []
+    for f in files:
+        df = pd.read_csv(f)
+        epi_count = (df["epistatic"] == True).sum()
+        if (min_epi is not None and epi_count < min_epi):
+            continue
+        if (max_epi is not None and epi_count > max_epi):
+            continue
+        keep.append((f, epi_count))
+    return keep  # list of (path, epi_count)
+
+def plot_epi_hist_gt400_onepage(
+    input_dir,
+    out_png,
+    hist=True,
+    bins=70,
+    show_modes=True,
+    fit=None,      # None | "kde" | "gaussian"
+    density=True,
+    figsize_scale=6
+):
+
+    selected = _collect_files_by_epi(input_dir, min_epi=401, max_epi=None)
+    n = len(selected)
+    if n == 0:
+        print("No datasets with epi > 400.")
+        return
+
+    rows, cols = _auto_grid(n)
+    fig, axes = plt.subplots(rows, cols, figsize=(cols*figsize_scale, rows*figsize_scale))
+    axes = np.atleast_2d(axes).reshape(rows, cols)
+
+    for i, (csv_path, _epi_cnt) in enumerate(selected):
+        r, c = divmod(i, cols)
+        tsuboyama_epi_single(
+            axes[r, c],
+            csv_path,
+            title=convert_name_tsuboyama(csv_path),
+            hist=hist,
+            bins=bins,
+            show_modes=show_modes,
+            fit=fit,
+            density=density
+        )
+
+    for k in range(n, rows*cols):
+        r, c = divmod(k, cols)
+        axes[r, c].axis("off")
+
+    plt.tight_layout()
+    Path(out_png).parent.mkdir(parents=True, exist_ok=True)
+    fig.savefig(out_png, dpi=300, bbox_inches="tight")
+    plt.close(fig)
+    print(f"Saved: {out_png} ({n} panels)")
+
+def plot_epi_hist_200to400_onepage(
+    input_dir,
+    out_png,
+    hist=True,
+    bins=70,
+    show_modes=True,
+    fit=None,
+    density=True,
+    figsize_scale=6
+):
+    selected = _collect_files_by_epi(input_dir, min_epi=201, max_epi=400)
+    n = len(selected)
+    if n == 0:
+        print("No datasets with 200 < epi ≤ 400.")
+        return
+
+    rows, cols = _auto_grid(n)
+    fig, axes = plt.subplots(rows, cols, figsize=(cols*figsize_scale, rows*figsize_scale))
+    axes = np.atleast_2d(axes).reshape(rows, cols)
+
+    for i, (csv_path, _epi_cnt) in enumerate(selected):
+        r, c = divmod(i, cols)
+        tsuboyama_epi_single(
+            axes[r, c],
+            csv_path,
+            title=convert_name_tsuboyama(csv_path),
+            hist=hist,
+            bins=bins,
+            show_modes=show_modes,
+            fit=fit,
+            density=density,
+            right_limit=3
+        )
+
+    for k in range(n, rows*cols):
+        r, c = divmod(k, cols)
+        axes[r, c].axis("off")
+
+    plt.tight_layout()
+    Path(out_png).parent.mkdir(parents=True, exist_ok=True)
+    fig.savefig(out_png, dpi=300, bbox_inches="tight")
+    plt.close(fig)
+    print(f"Saved: {out_png} ({n} panels)")
+    
+
+def plot_epi_hist_100to200_onepage(
+    input_dir,
+    out_png,
+    hist=True,
+    bins=70,
+    show_modes=True,
+    fit=None,
+    density=True,
+    figsize_scale=6
+):
+    """Все датасеты с 200 < epi ≤ 400 в одну фигуру (PNG)."""
+    selected = _collect_files_by_epi(input_dir, min_epi=101, max_epi=200)
+    n = len(selected)
+    if n == 0:
+        print("No datasets with 200 < epi ≤ 400.")
+        return
+
+    rows, cols = _auto_grid(n)
+    fig, axes = plt.subplots(rows, cols, figsize=(cols*figsize_scale, rows*figsize_scale))
+    axes = np.atleast_2d(axes).reshape(rows, cols)
+
+    for i, (csv_path, _epi_cnt) in enumerate(selected):
+        r, c = divmod(i, cols)
+        tsuboyama_epi_single(
+            axes[r, c],
+            csv_path,
+            title=convert_name_tsuboyama(csv_path),
+            hist=hist,
+            bins=bins,
+            show_modes=show_modes,
+            fit=fit,
+            density=density,
+            right_limit=3
+        )
+
+    for k in range(n, rows*cols):
+        r, c = divmod(k, cols)
+        axes[r, c].axis("off")
+
+    plt.tight_layout()
+    Path(out_png).parent.mkdir(parents=True, exist_ok=True)
+    fig.savefig(out_png, dpi=300, bbox_inches="tight")
+    plt.close(fig)
+    print(f"Saved: {out_png} ({n} panels)")

@@ -438,7 +438,7 @@ def combined_plot_somermeyer_with_whiskers(
         mask = np.isfinite(y_all) & np.isfinite(yerr_all)
         if mask.any():
             ax1.errorbar(centers[mask], y_all[mask], yerr=yerr_all[mask],
-                         fmt="none", ecolor="black", elinewidth=2.0, capsize=5, capthick=2.0, zorder=5)
+                         fmt="none", ecolor="dimgray", elinewidth=2.0, capsize=5, capthick=2.0, zorder=5)
 
         # ---- cosmetics
         ax1.set_ylabel("Spearman correlation", fontsize=14)
@@ -486,10 +486,11 @@ def somermeyer_top_models(input_dir, output_dir):
     result_rows = []
     for dataset in datasets:
         epi_scores = df[dataset + "_epistatic"].astype(float)  # use epistatic values
-        top5 = epi_scores.sort_values(ascending=False).head(5).index.tolist()
+        top5 = epi_scores.sort_values(ascending=False).head(5)
+
         row = {"Dataset": convert_name_to_gfp(dataset)}
-        for i, model in enumerate(top5, start=1):
-            row[f"Top-{i}"] = model
+        for i, (model, score) in enumerate(top5.items(), start=1):
+            row[f"Top-{i}"] = f"{model} ({score:.3f})"
         result_rows.append(row)
 
     result_table = pd.DataFrame(result_rows)
@@ -576,10 +577,11 @@ def tsuboyama_top_models(input_dir, output_dir, N=6):
         result_rows = []
         for dataset in datasets:
             epi_scores = df_scores[dataset + "_epistatic"].astype(float)  # use epistatic values
-            top5 = epi_scores.sort_values(ascending=False).head(5).index.tolist()
+            top5 = epi_scores.sort_values(ascending=False).head(5)
+
             row = {"Dataset": convert_name_tsuboyama(dataset)}
-            for j, model in enumerate(top5, start=1):
-                row[f"Top-{j}"] = model
+            for j, (model, score) in enumerate(top5.items(), start=1):
+                row[f"Top-{j}"] = f"{model} ({score:.3f})"
             result_rows.append(row)
 
         result_table = pd.DataFrame(result_rows)
@@ -594,6 +596,7 @@ def combined_plot_tsuboyama_with_whiskers(
     model_dir: Path,
     epi_dir: Path,
     seeds=(0,1,2,3,4),
+    n_sequences=100
 ):
     models_eval_dir = input_dir / "models_evaluation"
     output_dir = Path(output_dir); output_dir.mkdir(parents=True, exist_ok=True)
@@ -606,7 +609,7 @@ def combined_plot_tsuboyama_with_whiskers(
     # Dataset IDs from columns in best-models
     datasets = df_best.columns.str.replace("_all","",regex=False).str.replace("_epistatic","",regex=False).unique()
     dataset_counts = {dataset: df_counts.at["counts", dataset] for dataset in datasets}
-    subset = [d for d in datasets if dataset_counts[d] >= 400]
+    subset = [d for d in datasets if dataset_counts[d] >= n_sequences]
 
     # Re-run pipeline for each seed; collect the per-seed tables (floats)
     per_seed = []
@@ -673,7 +676,7 @@ def combined_plot_tsuboyama_with_whiskers(
         mask = np.isfinite(y_all) & np.isfinite(yerr_all)
         if mask.any():
             ax1.errorbar(centers[mask], y_all[mask], yerr=yerr_all[mask],
-                         fmt="none", ecolor="black", elinewidth=2.0, capsize=5, capthick=2.0, zorder=5)
+                         fmt="none", ecolor="dimgray", elinewidth=2.0, capsize=5, capthick=2.0, zorder=5)
 
         # ---- cosmetics
         ax1.set_ylabel("Spearman correlation", fontsize=14)
@@ -708,3 +711,205 @@ def combined_plot_tsuboyama_with_whiskers(
         plt.tight_layout()
         plt.savefig(output_dir / f"4_combined_plot_{dataset_name}_whiskers.png", bbox_inches="tight", dpi=300)
         plt.close()
+        
+
+def tsuboyama_top_models_by_seq(input_dir, output_dir, i=3, n_sequences=400):
+    file_path = input_dir / f"eval_tsuboyama_N{i}" / "models_evaluation" / "tsuboyama_best_models.csv"
+    df_scores = pd.read_csv(file_path, index_col=0)
+    
+    file_path = input_dir / f"eval_tsuboyama_N{i}" / "counts.csv"
+    df_counts = pd.read_csv(file_path, index_col=0)
+
+    # collect dataset names (strip the suffixes)
+    datasets = df_scores.columns.str.replace("_all", "", regex=False).str.replace("_epistatic", "", regex=False).unique()
+    # sort datasets by counts and select top 10
+    dataset_counts = {dataset: df_counts.at["counts", dataset] for dataset in datasets}
+    sorted_datasets = sorted(dataset_counts, key=lambda k: dataset_counts[k], reverse=True)[:6]
+    datasets = sorted_datasets
+
+    # build result table
+    result_rows = []
+    for dataset in datasets:
+        epi_scores = df_scores[dataset + "_epistatic"].astype(float)  # use epistatic values
+        top10 = epi_scores.sort_values(ascending=False).head(10)
+
+        selected = pd.read_csv(input_dir / f"tsuboyama_epistatic_N{i}" / f"{dataset}.csv")
+
+        row = {"Dataset": convert_name_tsuboyama(dataset),
+               "All sequences": len(selected[selected["num_mutations"] > 1]),
+               "Epistatic sequences": (selected["epistatic"] == True).sum()}
+        for j, (model, score) in enumerate(top10.items(), start=1):
+            row[f"Top-{j}"] = f"{model} ({score:.3f})"
+        result_rows.append(row)
+
+    result_table = pd.DataFrame(result_rows)
+    result_table = result_table.sort_values(by="Dataset")  # sort by Dataset alphabetically
+
+    result_table.to_csv(output_dir / f"2_tsuboyama_top10_{n_sequences}.csv", index=False)
+    
+    
+def combined_plot_tsuboyama_top50(
+    model_root_dir: Path,          # usually data_dir (has model score tables under data_dir/tsuboyama)
+    epi_dir: Path,                 # your existing epistasis dir (already has thermodynamic_coupling)
+    dataset_name: str,             # exact stem or unique substring in the epi_dir CSV name
+    models_eval_dir: Path,         # interm_tables_dir / "models_evaluation" (to read tsuboyama_best_models.csv)
+    output_dir: Path,              # where to save figure
+    top_n: int = 50,
+    seeds=(0, 1, 2, 3, 4),
+):
+    model_root_dir  = Path(model_root_dir)
+    epi_dir         = Path(epi_dir)
+    models_eval_dir = Path(models_eval_dir)
+    output_dir      = Path(output_dir); output_dir.mkdir(parents=True, exist_ok=True)
+
+    # --- which models to display (filter), same as your combined plots
+    df_best = pd.read_csv(models_eval_dir / "tsuboyama_best_models.csv", index_col=0)
+    best_models = df_best.index.tolist()
+
+    # --- locate dataset CSV INSIDE epi_dir (not model dir!)
+    if (epi_dir / f"{dataset_name}.csv").exists():
+        src_csv = epi_dir / f"{dataset_name}.csv"
+        ds_stem = dataset_name
+    else:
+        matches = sorted([p for p in epi_dir.glob("*.csv") if dataset_name in p.stem])
+        if not matches:
+            raise FileNotFoundError(f"No CSV in {epi_dir} matching '{dataset_name}'")
+        src_csv = matches[0]
+        ds_stem = src_csv.stem
+
+    # --- build a temporary epi labels dir using top-N |thermodynamic_coupling| from epi_dir CSV
+    with tempfile.TemporaryDirectory() as tmp:
+        epi_topN_dir = Path(tmp) / "epi_topN"
+        epi_topN_dir.mkdir(parents=True, exist_ok=True)
+
+        df = pd.read_csv(src_csv)
+        if "num_mutations" not in df.columns:
+            df["num_mutations"] = df["mutant"].apply(lambda x: len(str(x).split(":")))
+        doubles = df[df["num_mutations"] == 2].copy()
+        if "thermodynamic_coupling" not in doubles.columns:
+            raise ValueError(
+                f"'thermodynamic_coupling' not found in {src_csv}. "
+                "Make sure reconstruction already ran."
+            )
+
+        doubles["abs_tc"] = np.abs(doubles["thermodynamic_coupling"].astype(float))
+        doubles = doubles.sort_values("abs_tc", ascending=False)
+        doubles["epistatic"] = False
+        doubles.loc[doubles.head(top_n).index, "epistatic"] = True
+
+        # labels file that compute_result_table expects (mutant,epistatic)
+        selected = doubles[["mutant", "epistatic"]].copy()
+        selected.to_csv(epi_topN_dir / f"{ds_stem}.csv", index=False)
+
+        # --- recompute the result tables across seeds, restricted to THIS dataset only
+        dataset_set = [ds_stem]
+        per_seed = []
+        for seed in seeds:
+            res_df, _ = compute_result_table(
+                model_root_dir, epi_topN_dir, "tsuboyama",
+                seed=seed, dataset_set=dataset_set
+            )
+            res_df = linear_regression(
+                res_df, model_root_dir, epi_topN_dir, "tsuboyama",
+                seeds=1, seed_provided=seed, dataset_set=dataset_set
+            )
+            res_df = mlp(
+                res_df, model_root_dir, epi_topN_dir, "tsuboyama",
+                seeds=1, seed_provided=seed, dataset_set=dataset_set
+            )
+            res_df = res_df.apply(pd.to_numeric, errors="coerce")
+            per_seed.append(res_df)
+
+    # --- stack across seeds and prepare plotting
+    col_all = f"{ds_stem}_all"
+    col_epi = f"{ds_stem}_epistatic"
+
+    # union of model indices across seeds
+    all_models_idx = per_seed[0].index
+    for r in per_seed[1:]:
+        all_models_idx = all_models_idx.union(r.index)
+
+    mats_all, mats_epi = [], []
+    for r in per_seed:
+        a = r[col_all] if col_all in r.columns else pd.Series(index=r.index, dtype=float)
+        e = r[col_epi] if col_epi in r.columns else pd.Series(index=r.index, dtype=float)
+        mats_all.append(a.reindex(all_models_idx))
+        mats_epi.append(e.reindex(all_models_idx))
+
+    mat_all = np.abs(pd.concat(mats_all, axis=1))
+    mat_epi = np.abs(pd.concat(mats_epi, axis=1))
+
+    # filter to best models, sort locally like combined plots (baselines first, then mean all desc)
+    mat_all = mat_all.reindex(best_models)
+    mat_epi = mat_epi.reindex(best_models)
+
+    mean_all = mat_all.mean(axis=1, skipna=True)
+    mean_epi = mat_epi.mean(axis=1, skipna=True)
+    std_all  = mat_all.std(axis=1, ddof=0, skipna=True)
+
+    df_plot = pd.DataFrame({
+        "model": mean_all.index,
+        "all": mean_all.values,
+        "epistatic": mean_epi.values,
+        "delta": mean_all.values - mean_epi.values,
+        "all_std": std_all.values,
+    })
+
+    df_plot["sort_key"] = df_plot["model"].apply(lambda x: 1 if x in ["Linear_regression", "MLP"] else 0)
+    df_plot = df_plot.sort_values(by=["sort_key", "all"], ascending=[True, False]).reset_index(drop=True)
+
+    # --- plot
+    x = np.arange(len(df_plot))
+    width = 0.4
+    cmap = plt.get_cmap("Paired")
+    pretty = convert_name_tsuboyama(ds_stem)
+
+    fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(16, 12), sharex=True,
+                                    gridspec_kw={"height_ratios": [2, 1]})
+
+    bar_all = ax1.bar(x - width/2, df_plot["all"],       width=width, color=cmap(0), label="All points")
+    bar_epi = ax1.bar(x + width/2, df_plot["epistatic"], width=width, color=cmap(1), label="Epistatic points")
+
+    # whiskers: std across seeds for the 'All' bars
+    centers  = x - width/2
+    y_all    = df_plot["all"].to_numpy(dtype=float)
+    yerr_all = df_plot["all_std"].to_numpy(dtype=float)
+    mask = np.isfinite(y_all) & np.isfinite(yerr_all)
+    if mask.any():
+        ax1.errorbar(centers[mask], y_all[mask], yerr=yerr_all[mask],
+                     fmt="none", ecolor="dimgray", elinewidth=2.0, capsize=5, capthick=2.0, zorder=5)
+
+    ax1.set_ylabel("Spearman correlation", fontsize=14)
+    ax1.set_title(f"Spearman for {pretty} (Top {top_n} by $|\Delta \Delta G|$)", fontsize=16)
+    ax1.grid(True, axis="y"); ax1.tick_params(axis="y", labelsize=12)
+
+    # global medians
+    med_all = float(np.nanmedian(df_plot["all"]))
+    med_epi = float(np.nanmedian(df_plot["epistatic"]))
+    ax1.axhline(med_all, color="red",   linestyle="-", linewidth=1.8)
+    ax1.axhline(med_epi, color="green", linestyle="-", linewidth=1.8)
+
+    from matplotlib.lines import Line2D
+    ax1.legend(
+        [bar_all.patches[0], bar_epi.patches[0],
+         Line2D([0],[0], color="red",   linestyle="-", linewidth=1.8),
+         Line2D([0],[0], color="green", linestyle="-", linewidth=1.8)],
+        ["All points", "Epistatic points", "Median (all)", "Median (epistatic)"],
+        loc="upper left", prop={"size": 12}
+    )
+
+    ax2.bar(x, df_plot["delta"], color="cornflowerblue")
+    ax2.set_ylabel(r'$\Delta$ (All - Epistatic)', fontsize=14)
+    ax2.grid(True, axis="y"); ax2.tick_params(axis="y", labelsize=12)
+    ax2.set_xticks(x)
+    ax2.set_xticklabels(
+        [f"$\\bf{{{m}}}$" if m in ["Linear_regression", "MLP"] else m for m in df_plot["model"]],
+        fontsize=12, rotation=90
+    )
+    ax2.set_xlabel("Model", fontsize=14)
+
+    plt.tight_layout()
+    out_path = output_dir / f"6_combined_plot_{pretty}_top{top_n}_whiskers.png"
+    plt.savefig(out_path, bbox_inches="tight", dpi=300)
+    plt.close()
+    print(f"[OK] saved {out_path}")

@@ -1,4 +1,4 @@
 Dataset,Top-1,Top-2,Top-3,Top-4,Top-5
-amacGFP,PoET,ESCOTT,MSA_Transformer_ensemble,TranceptEVE_L,Tranception_L
-cgreGFP,VESPA,VESPAl,Wavenet,ProtSSN_k20_h512,ESCOTT
-ppluGFP,ESCOTT,PoET,RSALOR,GEMME,VESPAl
+amacGFP,PoET (0.239),ESCOTT (0.239),MSA_Transformer_ensemble (0.235),TranceptEVE_L (0.229),Tranception_L (0.218)
+cgreGFP,VESPA (0.309),VESPAl (0.306),Wavenet (0.293),ProtSSN_k20_h512 (0.285),ESCOTT (0.269)
+ppluGFP,ESCOTT (0.240),PoET (0.235),RSALOR (0.231),GEMME (0.221),VESPAl (0.207)

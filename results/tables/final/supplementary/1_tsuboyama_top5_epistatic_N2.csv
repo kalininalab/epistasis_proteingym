@@ -1,11 +1,11 @@
 Dataset,Top-1,Top-2,Top-3,Top-4,Top-5
-AMFR_HUMAN_4G3O,MLP,Linear_regression,ProSST-1024,SaProt_35M_AF2,VenusREM
-CBX4_HUMAN_2K28,MLP,Linear_regression,DeepSequence_ensemble,SaProt_35M_AF2,S2F_MSA
-DOCK1_MOUSE_2M0Y,MLP,Linear_regression,VenusREM,EVE_ensemble,SiteRM
-HECD1_HUMAN_3DKM,MLP,Linear_regression,ESM2_150M,ESM-IF1,ESM3
-MYO3_YEAST_2BTT,MLP,Linear_regression,VenusREM,ProSST-1024,ESMC-300M
-OBSCN_HUMAN_1V1C,Linear_regression,MLP,S3F,ESM2_150M,ESMC-300M
-PITX2_HUMAN_2L7M,MLP,Linear_regression,ESM2_150M,S3F,ProSST-1024
-POLG_PESV_2MXD,MLP,Linear_regression,ProSST-1024,SaProt_35M_AF2,VenusREM
-SPTN1_CHICK_1TUD,MLP,Linear_regression,ProSST-1024,S3F,S2F_MSA
-UBE4B_HUMAN_3L1X,Linear_regression,MLP,ESCOTT,ESM3,GEMME
+AMFR_HUMAN_4G3O,MLP (0.553),Linear_regression (0.553),ProSST-1024 (0.384),SaProt_35M_AF2 (0.305),VenusREM (0.238)
+CBX4_HUMAN_2K28,MLP (0.479),Linear_regression (0.479),DeepSequence_ensemble (0.434),SaProt_35M_AF2 (0.421),S2F_MSA (0.398)
+DOCK1_MOUSE_2M0Y,MLP (0.581),Linear_regression (0.580),VenusREM (0.364),EVE_ensemble (0.340),SiteRM (0.326)
+HECD1_HUMAN_3DKM,MLP (0.560),Linear_regression (0.560),ESM2_150M (0.180),ESM-IF1 (0.168),ESM3 (0.147)
+MYO3_YEAST_2BTT,MLP (0.713),Linear_regression (0.713),VenusREM (0.615),ProSST-1024 (0.592),ESMC-300M (0.591)
+OBSCN_HUMAN_1V1C,Linear_regression (0.813),MLP (0.813),S3F (0.709),ESM2_150M (0.682),ESMC-300M (0.679)
+PITX2_HUMAN_2L7M,MLP (0.655),Linear_regression (0.654),ESM2_150M (0.424),S3F (0.396),ProSST-1024 (0.392)
+POLG_PESV_2MXD,MLP (0.790),Linear_regression (0.789),ProSST-1024 (0.727),SaProt_35M_AF2 (0.718),VenusREM (0.654)
+SPTN1_CHICK_1TUD,MLP (0.847),Linear_regression (0.847),ProSST-1024 (0.730),S3F (0.714),S2F_MSA (0.657)
+UBE4B_HUMAN_3L1X,Linear_regression (0.656),MLP (0.655),ESCOTT (0.379),ESM3 (0.373),GEMME (0.355)

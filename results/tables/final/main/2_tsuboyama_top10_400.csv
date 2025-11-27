@@ -1,0 +1,7 @@
+Dataset,All sequences,Epistatic sequences,Top-1,Top-2,Top-3,Top-4,Top-5,Top-6,Top-7,Top-8,Top-9,Top-10
+AMFR_HUMAN_4G3O,2152,478,Linear_regression (0.505),MLP (0.504),ProSST-1024 (0.366),SaProt_35M_AF2 (0.306),VenusREM (0.214),ESM1v_ensemble (0.189),Site_Independent (0.174),Tranception_M (0.168),ESM-IF1 (0.166),EVmutation (0.162)
+HECD1_HUMAN_3DKM,4342,518,Linear_regression (0.532),MLP (0.532),ESM-IF1 (0.209),ESM2_150M (0.204),ESM3 (0.164),Progen3_3b (0.157),ProtSSN_k30_h1280 (0.131),ProteinMPNN (0.130),CARP_76M (0.125),EVmutation (0.123)
+MYO3_YEAST_2BTT,2350,577,MLP (0.669),Linear_regression (0.669),VenusREM (0.590),ProSST-1024 (0.566),ESMC-300M (0.564),ESM2_150M (0.547),xTrimoPGLM-10B-MLM (0.491),ProtSSN_k30_h1280 (0.452),ESM1b (0.449),PoET (0.434)
+OBSCN_HUMAN_1V1C,1984,433,Linear_regression (0.712),MLP (0.712),S3F (0.610),ESMC-300M (0.596),ESM2_150M (0.592),S2F_MSA (0.575),CARP_76M (0.567),VenusREM (0.557),ProtSSN_k30_h1280 (0.553),DeepSequence_ensemble (0.553)
+POLG_PESV_2MXD,4135,480,MLP (0.786),Linear_regression (0.786),SaProt_35M_AF2 (0.757),ProSST-1024 (0.737),VenusREM (0.667),S3F (0.651),ProtSSN_k30_h1280 (0.614),S2F_MSA (0.549),ESM-IF1 (0.495),ESM3 (0.474)
+UBE4B_HUMAN_3L1X,2504,645,Linear_regression (0.647),MLP (0.647),ESCOTT (0.388),ESM3 (0.385),GEMME (0.365),VenusREM (0.364),MIF (0.353),RSALOR (0.346),ESMC-300M (0.331),ProSST-1024 (0.327)
