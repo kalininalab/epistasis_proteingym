@@ -1,27 +1,7 @@
-from src.analysis import compute_result_table, select_best_models, build_tsuboyama_N_series
-from src.paths import data_dir, interm_tables_dir, main_figures_dir, supp_figures_dir
-from src.models.linear_regression import linear_regression
-from src.models.mlp import mlp
-from src.plotting import combined_plot_tsuboyama
+from pathlib import Path
+from typing import Optional, Iterable, Tuple
+import pandas as pd
+from collections import Counter
 
-
-results, counts = compute_result_table(data_dir, interm_tables_dir / "tsuboyama_epistatic", "tsuboyama")
-counts.to_csv(interm_tables_dir / "counts.csv", index=True)
-
-results = linear_regression(results, data_dir, interm_tables_dir / "tsuboyama_epistatic", "tsuboyama")
-
-final_results = mlp(results, data_dir, interm_tables_dir / "tsuboyama_epistatic", "tsuboyama")
-final_results.dropna(axis=1, how="all", inplace=True)
-output_dir = interm_tables_dir / "models_evaluation" 
-final_results.to_csv(output_dir / "tsuboyama_all_models.csv", index=True)
-
-select_best_models(interm_tables_dir / "models_evaluation", "tsuboyama")
-
-combined_plot_tsuboyama(interm_tables_dir, main_figures_dir)
-
-build_tsuboyama_N_series(
-    raw_tsuboyama_dir = interm_tables_dir / "tsuboyama_epistatic",
-    model_root_dir    = data_dir,
-    work_root_dir     = interm_tables_dir,
-    figures_dir       = supp_figures_dir,
-)
+a = [478,131,56,34,98,267,124,143,99,283,175,158,518,43,119,113,577,126,40,21,433,4,27,228,480,106,40,38,26,95,96,34,57,82,93,48,98,95,56,257,69,64,30,55,1,645,9,106,244,66]
+print(max(a))

@@ -124,7 +124,8 @@ def explore_N_values(input_dir, output_dir):
                     item.unlink()
 
     plt.tight_layout()
-    fig.savefig(os.path.join(output_dir, "1_GFP_N_explored.png"), dpi=300, bbox_inches="tight")
+    fig.savefig(os.path.join(output_dir, "supp_GFP_N_explored.png"), dpi=300, bbox_inches="tight")
+    fig.savefig(os.path.join(output_dir, "supp_GFP_N_explored.pdf"), bbox_inches="tight")
     plt.close(fig)
     
     
@@ -250,6 +251,7 @@ def explore_N_values_tsuboyama(input_dir, output_dir, filename=None, pattern="*.
 
     plt.tight_layout()
     fig.savefig(output_dir / "3_Tsuboyama_N_explored.png", dpi=300, bbox_inches="tight")
+    fig.savefig(output_dir / "3_Tsuboyama_N_explored.pdf", bbox_inches="tight")
     plt.close(fig)
     
 # for notebook 03    
@@ -472,6 +474,7 @@ def combined_plot_somermeyer_with_whiskers(
 
         plt.tight_layout()
         plt.savefig(output_dir / f"2_combined_plot_{dataset_name}_whiskers.png", bbox_inches="tight", dpi=300)
+        plt.savefig(output_dir / f"2_combined_plot_{dataset_name}_whiskers.pdf", bbox_inches="tight")
         plt.close()
     
 

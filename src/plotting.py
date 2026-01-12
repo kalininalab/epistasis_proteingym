@@ -5,6 +5,7 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 from matplotlib.lines import Line2D
 import numpy as np
+from typing import Union, Optional, Tuple, List
 from .utils import convert_name_to_gfp, convert_name_tsuboyama, extract_dataset_name
 
 # for notebook 01
@@ -34,19 +35,19 @@ def mut_hist_somermeyer(file, ax=None, max_k=10):
 
     # labels and style
     ax.set_xticks(x)
-    ax.set_xlabel("Number of mutations", fontsize=12, labelpad=6)
-    ax.set_ylabel("Frequency", fontsize=12, labelpad=6)
-    ax.tick_params(axis="both", labelsize=11)
+    ax.set_xlabel("Number of mutations", fontsize=13, labelpad=6)
+    ax.set_ylabel("Frequency", fontsize=13, labelpad=6)
+    ax.tick_params(axis="both", labelsize=12)
 
     name = file.name.split(".")[0]
     name = convert_name_to_gfp(name)
     ax.set_title(f"Distribution of the number of mutations for {name}", fontsize=13)
-
+    plt.tight_layout()
     # annotate how many variants are beyond max_k
     ax.text(
         0.98, 0.92,
         f"{tail_n} variants with >{max_k} mutations",
-        ha="right", va="top", transform=ax.transAxes, fontsize=10
+        ha="right", va="top", transform=ax.transAxes, fontsize=13
     )
     ax.grid(axis='y', linestyle='--', alpha=0.7)
     return ax
@@ -71,16 +72,17 @@ def mut_hist_tsuboyama(tsuboyama_data_dir, save_path=None):
     # plot
     fig, ax = plt.subplots(figsize=(12, 6))
     result_df.plot(kind="bar", ax=ax)
-    ax.set_xlabel("Dataset", fontsize=12)
-    ax.set_ylabel("Frequency", fontsize=12)
-    ax.set_title("Distribution of mutations per dataset", fontsize=13)
-    ax.legend(title="Mutations")
+    ax.set_xlabel("Dataset", fontsize=13)
+    ax.set_ylabel("Frequency", fontsize=13)
+    ax.set_title("Distribution of mutations per Tsuboyama dataset", fontsize=13)
+    ax.legend(title="Mutations", title_fontsize=13, fontsize=13)
+    ax.tick_params(axis="both", labelsize=12)
     ax.grid(axis='y', linestyle='--', alpha=0.7)
 
     plt.tight_layout()
 
     if save_path:
-        plt.savefig(save_path, dpi=300)
+        plt.savefig(save_path, dpi=300, bbox_inches="tight")
         plt.close(fig)
     else:
         plt.show()
@@ -109,7 +111,44 @@ def val_hist_somermeyer(somermeyer_data_dir, save_path=None):
         plt.close()
     else:
         plt.show()
-        
+     
+     
+def val_violin_somermeyer(somermeyer_data_dir, save_path=None):
+    data = []
+    labels = []
+
+    for file in Path(somermeyer_data_dir).glob("*.csv"):
+        df = pd.read_csv(file)
+        name = convert_name_to_gfp(file.stem)
+
+        vals = df["DMS_score"].dropna().values
+        if len(vals) == 0:
+            continue
+
+        data.append(vals)
+        labels.append(name)
+
+    plt.figure(figsize=(6, 6))
+    parts = plt.violinplot(data, showmeans=False, showmedians=True)
+
+    # Add x-axis labels
+    plt.xticks(
+        ticks=range(1, len(labels) + 1),
+        labels=labels,
+        fontsize=12
+    )
+
+    plt.ylabel("DMS_score", fontsize=13)
+    plt.title("Distribution of DMS_score per GFP dataset", fontsize=13)
+    plt.grid(alpha=0.4)
+    plt.tight_layout()
+
+    if save_path:
+        plt.savefig(save_path, dpi=300, bbox_inches="tight")
+        plt.close()
+    else:
+        plt.show()
+                
         
 def val_boxplot_tsuboyama(tsuboyama_data_dir, save_path=None):
     dict_names = {}
@@ -143,6 +182,60 @@ def val_boxplot_tsuboyama(tsuboyama_data_dir, save_path=None):
     plt.close()
     
     
+def val_violin_tsuboyama(tsuboyama_data_dir, save_path=None):
+    dict_names = {}
+
+    for file in Path(tsuboyama_data_dir).glob("*.csv"):
+        # dataset name = first two parts of filename
+        name = "_".join(file.stem.split("_")[:2])
+        df = pd.read_csv(file)
+        dict_names[name] = df["DMS_score"].dropna().values
+
+    plt.figure(figsize=(12, 6))
+
+    # violin plot requires list of arrays in order
+    data = list(dict_names.values())
+    labels = list(dict_names.keys())
+
+    parts = plt.violinplot(
+        dataset=data,
+        showmeans=False,
+        showmedians=True,
+        showextrema=False
+    )
+
+    # color customization
+    for body in parts['bodies']:
+        body.set_facecolor("lightblue")
+        body.set_edgecolor("black")
+        body.set_alpha(0.7)
+
+    # median line color
+    if "cmedians" in parts:
+        parts["cmedians"].set_color("black")
+        parts["cmedians"].set_linewidth(2)
+
+    plt.xticks(
+        ticks=range(1, len(labels) + 1),
+        labels=labels,
+        ha="right",
+        rotation=90,
+        fontsize=12
+    )
+
+    plt.ylabel("DMS_score", fontsize=13)
+    plt.title("Distribution of DMS_score across Tsuboyama datasets", fontsize=13)
+    plt.grid(axis="y", linestyle='--', alpha=0.7)
+    plt.tight_layout()
+
+    if save_path:
+        plt.savefig(save_path, dpi=300, bbox_inches="tight")
+    else:
+        plt.show()
+
+    plt.close()    
+    
+    
 # for notebook 02
 
 def dotplot_single(ax, file_path, title, hist=False):
@@ -159,25 +252,33 @@ def dotplot_single(ax, file_path, title, hist=False):
     
     if hist:
         # Bar plot for counts of x and epi_x
-        counts = [len(x), len(epi_x)]
-        bar_labels = [len(x), len(epi_x)]
-        bar_colors = [cmap(0), cmap(1)]
+        counts = [len(epi_x), len(x)]
+        bar_labels = [len(epi_x), len(x)]
+        bar_colors = [cmap(1), cmap(0)]
         # Position the bar plot in the right bottom corner
         inset_ax = ax.inset_axes([0.75, 0.05, 0.2, 0.2])
         inset_ax.bar(range(len(bar_labels)), counts, color=bar_colors, alpha=0.8)
         inset_ax.set_xticks(range(len(bar_labels)))
         inset_ax.set_xticklabels(bar_labels, fontsize=14)
         inset_ax.get_yaxis().set_visible(False)
-        inset_ax.set_title('Sequence count', fontsize=12)
-        inset_ax.tick_params(axis='both', which='major', labelsize=12)
-        ax.legend(loc="lower center", fontsize=14)
+        inset_ax.set_title('Sequence count', fontsize=16)
+        inset_ax.tick_params(axis='both', which='major', labelsize=14)
+        ax.legend(loc="lower center", fontsize=16)
 
+    if title == "amacGFP":
+        title = r"GFP from $\mathit{A.\ macrodactyla}$ (amacGFP)"
+    if title == "cgreGFP":
+        title = r"GFP from $\mathit{C.\ gregaria}$ (cgreGFP)"
+    if title == "ppluGFP":
+        title = r"GFP from $\mathit{P.\ plumata}$ (ppluGFP)"
     ax.set_title(title, fontsize=18)
-    ax.set_xlabel("Brightness value of a multi mutant", fontsize=16)
-    ax.set_ylabel("Sum of brightness values of single mutants", fontsize=16)
+    ax.tick_params(axis='both', which='both', labelsize=14)
+    ax.set_xlabel("Brightness value of a multi mutant", fontsize=18)
+    ax.set_ylabel("Sum of brightness values of single mutants", fontsize=18)
     if not hist:
         ax.legend(fontsize=16)
     ax.grid(True)
+    plt.tight_layout()
     
 
 def dotplot_triplet(directory, save_path=None, hist=True, pattern="*GFP*.csv", axes=None, title=None):
@@ -186,7 +287,7 @@ def dotplot_triplet(directory, save_path=None, hist=True, pattern="*GFP*.csv", a
     
     created_fig = None
     if axes is None:
-        created_fig, axes = plt.subplots(nrows=1, ncols=3, figsize=(24, 8))
+        created_fig, axes = plt.subplots(nrows=1, ncols=3, figsize=(27, 9))
 
     for idx, file in enumerate(files):
         if title is not None:
@@ -213,18 +314,26 @@ def std_distribution_single(ax, file_path, title, bins=30):
     ax.hist(epi, bins=bins, alpha=0.5, color="blue", label="epistatic mutants", density=True)
     ax.hist(non, bins=bins, alpha=0.5, color="orange", label="non-epistatic mutants", density=True)
 
-    ax.set_title(title, fontsize=16)
-    ax.set_xlabel("Standard deviation of brightness", fontsize=14)
-    ax.set_ylabel("Density", fontsize=14)
-    ax.grid(True)     
-    ax.legend(fontsize=14)
+    if title == "amacGFP":
+        title = r"GFP from $\mathit{A.\ macrodactyla}$ (amacGFP)"
+    if title == "cgreGFP":
+        title = r"GFP from $\mathit{C.\ gregaria}$ (cgreGFP)"
+    if title == "ppluGFP":
+        title = r"GFP from $\mathit{P.\ plumata}$ (ppluGFP)"
+        
+    ax.tick_params(axis='both', which='both', labelsize=14)
+    ax.set_title(title, fontsize=18)
+    ax.set_xlabel("Standard deviation of brightness", fontsize=18)
+    ax.set_ylabel("Density", fontsize=18)    
+    ax.legend(fontsize=16)
+    plt.tight_layout()
 
 
 def std_distribution_triplet(directory, save_path=None, bins=30):
     directory = Path(directory)
     file_paths = sorted(directory.glob("*GFP*.csv"))[:3]
 
-    fig, axes = plt.subplots(nrows=1, ncols=3, figsize=(24, 8))
+    fig, axes = plt.subplots(nrows=1, ncols=3, figsize=(27, 9))
 
     for idx, file in enumerate(file_paths):
         title = file.stem
@@ -265,17 +374,19 @@ def tsuboyama_dotplot_single(ax, csv_path, title=None, hist=False):
         inset_ax.set_xticks([0, 1])
         inset_ax.set_xticklabels([str(c) for c in counts], fontsize=14)
         inset_ax.get_yaxis().set_visible(False)
-        inset_ax.set_title("Sequence count", fontsize=12)
-        inset_ax.tick_params(axis="both", which="major", labelsize=12)
+        inset_ax.set_title("Sequence count", fontsize=16)
+        inset_ax.tick_params(axis="both", which="major", labelsize=14)
         # local legend placement same as before when hist=True
-        ax.legend(loc="lower center", fontsize=14)
+        ax.legend(loc="lower center", fontsize=16)
 
+    ax.tick_params(axis='both', which='both', labelsize=14)
     ax.set_title(title or convert_name_tsuboyama(csv_path), fontsize=18)
-    ax.set_xlabel("dG of a double mutant", fontsize=16)
-    ax.set_ylabel("Reconstructed dG of a double mutant", fontsize=16)
+    ax.set_xlabel("ΔG of a double mutant", fontsize=18)
+    ax.set_ylabel("Reconstructed ΔG of a double mutant", fontsize=18)
     if not hist:
         ax.legend(fontsize=16)
     ax.grid(True)
+    plt.tight_layout()
     
 
 def tsuboyama_dotplot_grid(input_dir, out_dir, chunk_size=12, rows=4, cols=3, hist=True):
@@ -308,8 +419,8 @@ def tsuboyama_dotplot_grid(input_dir, out_dir, chunk_size=12, rows=4, cols=3, hi
             axes[r, c].axis("off")
 
         plt.tight_layout()
-        out_path = out_dir / f"part_{page_idx}.png"
-        fig.savefig(out_path, dpi=300, bbox_inches="tight")
+        fig.savefig(out_dir / f"part_{page_idx}.png", dpi=300, bbox_inches="tight")
+        fig.savefig(out_dir / f"part_{page_idx}.pdf",bbox_inches="tight")
         plt.close(fig)
         
 
@@ -508,7 +619,8 @@ def combined_plot_somermeyer(input_dir, output_dir):
         ax2.set_xlabel('Model', fontsize=14)
 
         plt.tight_layout()
-        plt.savefig(output_dir / f'2_combined_plot_{dataset_name}.png', bbox_inches='tight', dpi=300)
+        #plt.savefig(output_dir / f'2_combined_plot_{dataset_name}.png', bbox_inches='tight', dpi=300)
+        plt.savefig(output_dir / f'3_combined_plot_{dataset_name}.pdf', bbox_inches='tight')
         plt.close()
         
 
@@ -1015,3 +1127,724 @@ def plot_epi_hist_100to200_onepage(
     fig.savefig(out_png, dpi=300, bbox_inches="tight")
     plt.close(fig)
     print(f"Saved: {out_png} ({n} panels)")
+    
+    
+def gfp_rank_heatmap(
+    models_eval_dir: Union[str, Path],
+    source: str = "best",                # "best" -> somermeyer_best_models.csv, "all" -> somermeyer_all_models.csv
+    subset: str = "epistatic",           # "epistatic" or "all"
+    out_png: Optional[Union[str, Path]] = None,
+    out_pdf: Optional[Union[str, Path]] = None,
+    figsize: Tuple[int, int] = (18, 12),
+    annot: bool = True,                  # show rank numbers in cells
+    fontsize: int = 18,
+    dataset_order: Optional[List[str]] = None  # e.g. ["amacGFP", "cgreGFP", "ppluGFP"]
+):
+    """
+    Build per-dataset rank table (1 = best Spearman) for the GFP datasets,
+    plus a 'Mean' rank column. Heatmap colors: green = better (lower rank), red = worse.
+    No statistical tests are performed.
+
+    Returns:
+      ranks_df (models × [datasets + 'Mean']), winners (Series with Top-1 counts)
+    """
+    models_eval_dir = Path(models_eval_dir)
+    csv_name = "somermeyer_best_models.csv" if source == "best" else "somermeyer_all_models.csv"
+    df = pd.read_csv(models_eval_dir / csv_name, index_col=0)
+
+    # pick columns
+    suffix = "_epistatic" if subset == "epistatic" else "_all"
+    cols = [c for c in df.columns if c.endswith(suffix)]
+
+    if not cols:
+        raise ValueError(f"No columns with suffix '{suffix}' found in {csv_name}.")
+
+    # Define your suffix once (edit if needed)
+    suffix = "_epistatic"
+
+    # --- Robust column detection + mapping ---
+    # 1) Try to find columns that end with the suffix (case-insensitive)
+    cand = [c for c in df.columns if c.lower().endswith(suffix.lower())]
+
+    if cand:
+        # Map "pretty label" -> actual column with suffix
+        mapping = {}
+        for c in cand:
+            raw = c[: -len(suffix)]
+            try:
+                pretty = convert_name_to_gfp(raw)
+            except NameError:
+                pretty = raw
+            mapping[pretty] = c
+    else:
+        # 2) Fallback: no suffix columns found. Try to pick dataset-like columns directly.
+        #    Heuristic: columns that contain 'GFP' and are not the '_all' ones.
+        guess = [c for c in df.columns if "GFP" in c and not c.lower().endswith("_all")]
+        # If user specified order, keep only those that actually exist
+        if 'dataset_order' in locals() and dataset_order is not None:
+            guess = [c for c in dataset_order if c in df.columns] or guess
+
+        mapping = {}
+        for c in guess:
+            try:
+                pretty = convert_name_to_gfp(c)
+            except NameError:
+                pretty = c
+            mapping[pretty] = c
+
+    # 3) Final dataset list honoring optional user order
+    if 'dataset_order' in locals() and dataset_order is not None:
+        datasets = [d for d in dataset_order if d in mapping]
+    else:
+        datasets = sorted(mapping.keys())
+
+    if not datasets:
+        raise KeyError("Could not find any dataset columns matching the expected pattern.")
+
+    # 4) Assemble Spearman matrix and rename columns to pretty labels
+    spearman = df[[mapping[d] for d in datasets]].apply(pd.to_numeric, errors="coerce")
+    spearman.columns = datasets
+
+    # Rank within each dataset (descending Spearman => ascending rank)
+    ranks = spearman.rank(axis=0, ascending=False, method="average")
+
+    # Mean rank (lower is better)
+    ranks["Mean"] = ranks.mean(axis=1, skipna=True)
+
+    # Sort models by Mean rank (asc), tie-break alphabetically
+    order = sorted(ranks.index.tolist(), key=lambda m: (ranks.loc[m, "Mean"], m.lower()))
+    ranks = ranks.loc[order]
+
+    # Count how many times each model is rank-1 (top) across datasets
+    winners = (ranks[datasets].apply(lambda col: col == col.min(), axis=0)).sum(axis=1)
+    winners = winners.loc[order].astype(int)
+
+    # Plot heatmap (green = good/low rank; red = bad/high rank)
+    plt.figure(figsize=figsize)
+    annot_kws = {"fontsize": fontsize}
+
+    ax = sns.heatmap(
+        ranks,
+        cmap="RdYlGn",
+        vmin=1, vmax=float(ranks[datasets].max().max()),
+        annot=annot,
+        annot_kws=annot_kws,              # <- make cell numbers match your font size/family
+        fmt=".1f" if annot else "",
+        cbar_kws={"label": "Rank (lower is better)"},
+        linewidths=0.5, linecolor="white", square=False
+    )
+    
+    ax.set_title(f"GFP model ranking by {subset} Spearman (per dataset)", fontsize=fontsize+2)
+    ax.set_xlabel("Dataset", fontsize=fontsize)
+    ax.set_ylabel("Model", fontsize=fontsize)
+    ax.tick_params(axis="x", labelsize=fontsize)
+    ax.tick_params(axis="y", labelsize=fontsize)
+
+    # Colorbar fonts
+    cbar = ax.collections[0].colorbar
+    cbar.ax.tick_params(labelsize=fontsize)       # tick font size
+    cbar.set_label("Rank (lower is better)", fontsize=fontsize)  # label size
+
+    plt.tight_layout()
+    if out_png is not None:
+        Path(out_png).parent.mkdir(parents=True, exist_ok=True)
+        plt.savefig(out_png, dpi=300, bbox_inches="tight")
+    elif out_pdf is not None:
+        Path(out_pdf).parent.mkdir(parents=True, exist_ok=True)
+        plt.savefig(out_pdf, bbox_inches="tight")
+    else:
+        plt.show()
+
+    # Small printed summary
+    #print("Top-1 counts across datasets (ties count for all tied best):")
+    #print(winners.sort_values(ascending=False))
+
+    return ranks, winners    
+    
+
+def models_dotplot_single(
+    ax,
+    csv_path,
+    dataset_key,
+    title=None,
+    abs_vals: bool = False,
+    xlim=(-1.0, 1.0),
+    ylim=(-1.0, 1.0),
+    point_size=80,
+    alpha=0.75,
+    top_k: int = 5,
+    out_topk_csv=None,         # path to save Top-K + baselines (optional)
+    list_topk_in_legend=False, # if True: list each Top-K model by name in the legend
+    legend_fontsize=14,
+    exclude_baselines_in_topk: bool = True,  # NEW: MLP/LinReg don't count toward Top-K
+):
+    """
+    Scatter for a single dataset across models:
+      x = Spearman('<dataset_key>_all'), y = Spearman('<dataset_key>_epistatic')
+
+    Highlights:
+      - Top-K by epistatic (y) in black (optionally excluding baselines from the K)
+      - 'MLP' and 'Linear_regression' in red
+    If list_topk_in_legend=True, the legend shows each Top-K model name as a separate black point.
+    Saves CSV with Top-K plus baselines if out_topk_csv is provided.
+    """
+    import numpy as np
+    import pandas as pd
+    import matplotlib.pyplot as plt
+    from matplotlib.lines import Line2D
+    from pathlib import Path
+
+    df = pd.read_csv(csv_path, index_col=0)
+
+    def _resolve(col_suffix: str) -> str:
+        exact = f"{dataset_key}{col_suffix}"
+        if exact in df.columns:
+            return exact
+        cand = [c for c in df.columns
+                if c.lower().endswith(col_suffix.lower())
+                and dataset_key.lower() in c.lower()]
+        if len(cand) == 1:
+            return cand[0]
+        if len(cand) == 0:
+            raise KeyError(
+                f"No column matching '{dataset_key}{col_suffix}' "
+                f"or containing '{dataset_key}' with suffix '{col_suffix}'."
+            )
+        raise KeyError(f"Multiple matches for '{dataset_key}{col_suffix}': {cand}")
+
+    col_all = _resolve("_all")
+    col_epi = _resolve("_epistatic")
+
+    x_raw = pd.to_numeric(df[col_all], errors="coerce").to_numpy()
+    y_raw = pd.to_numeric(df[col_epi],  errors="coerce").to_numpy()
+    names_raw = df.index.to_numpy(dtype=object)
+
+    x = x_raw.copy(); y = y_raw.copy(); names = names_raw.copy()
+    if abs_vals:
+        x = np.abs(x); y = np.abs(y)
+        x_raw = np.abs(x_raw); y_raw = np.abs(y_raw)
+
+    mask = np.isfinite(x) & np.isfinite(y)
+    x = x[mask]; y = y[mask]; names = names[mask]
+
+    cmap = plt.get_cmap("Paired")
+    ax.scatter(x, y, s=point_size, color=cmap(1), alpha=alpha, edgecolors="none", zorder=1)
+
+    if x.size: ax.axvline(float(np.median(x)), color="gray", ls="--", lw=1.2, alpha=0.9, zorder=0)
+    if y.size: ax.axhline(float(np.median(y)), color="gray", ls="--", lw=1.2, alpha=0.9, zorder=0)
+
+    # Top-K by epistatic (desc), optionally excluding baselines from K
+    if y.size:
+        order = np.argsort(-y)  # descending
+        if exclude_baselines_in_topk:
+            order = [i for i in order if names[i] not in {"MLP", "Linear_regression"}]
+        k = min(top_k, len(order))
+        top_idx = np.array(order[:k], dtype=int) if k > 0 else np.array([], dtype=int)
+    else:
+        top_idx = np.array([], dtype=int)
+
+    top_mask = np.zeros_like(y, dtype=bool)
+    if top_idx.size:
+        top_mask[top_idx] = True
+
+    red_mask = (names == "MLP") | (names == "Linear_regression")
+
+    if top_mask.any():
+        ax.scatter(x[top_mask], y[top_mask],
+                   s=point_size, color="black", alpha=0.95, zorder=3)
+    if red_mask.any():
+        ax.scatter(x[red_mask], y[red_mask],
+                   s=point_size, color="#E74C3C", alpha=0.95, zorder=4)
+
+    if out_topk_csv is not None:
+        rows = []
+        if top_mask.any():
+            for xi, yi, ni in zip(x[top_mask], y[top_mask], names[top_mask]):
+                rows.append({"model": ni, "spearman_all": xi, "spearman_epistatic": yi, "group": "top_k"})
+        for base in ["MLP", "Linear_regression"]:
+            if base in names_raw:
+                b_idx = np.where(names_raw == base)[0][0]
+                rows.append({
+                    "model": base,
+                    "spearman_all": x_raw[b_idx],
+                    "spearman_epistatic": y_raw[b_idx],
+                    "group": "baseline"
+                })
+        top_df = pd.DataFrame(rows)
+        if not top_df.empty:
+            top_df = top_df.drop_duplicates(subset=["model"], keep="first")
+            Path(out_topk_csv).parent.mkdir(parents=True, exist_ok=True)
+            top_df.to_csv(out_topk_csv, index=False)
+
+    if list_topk_in_legend and top_mask.any():
+        handles = [Line2D([0], [0], linestyle="--", color="gray", lw=1.6, label="median Spearman")]
+        if red_mask.any():
+            handles.append(Line2D([0], [0], marker="o", linestyle="None", markersize=8,
+                                  color="#E74C3C", label="baseline models"))
+        for ni in names[top_mask]:
+            handles.append(Line2D([0], [0], marker="o", linestyle="None", markersize=8,
+                                  color="black", label=str(ni)))
+        ax.legend(handles=handles, loc="upper left", frameon=True, framealpha=0.9,
+                  fontsize=legend_fontsize, scatterpoints=1)
+    else:
+        legend_handles = [
+            Line2D([0], [0], linestyle="--", color="gray", lw=1.6, label="median Spearman"),
+            Line2D([0], [0], marker="o", linestyle="None", markersize=8, color="black", label=f"top-{top_k} epistatic"),
+            Line2D([0], [0], marker="o", linestyle="None", markersize=8, color="#E74C3C", label="baseline models"),
+        ]
+        ax.legend(handles=legend_handles, loc="upper left", frameon=True, framealpha=0.9,
+                  fontsize=legend_fontsize, scatterpoints=1)
+
+    if title is None:
+        try:
+            from .utils import convert_name_to_gfp
+            title = f"{convert_name_to_gfp(dataset_key)}"
+        except Exception:
+            title = dataset_key
+
+    if title == "amacGFP":
+        title = r"GFP from $\mathit{A.\ macrodactyla}$ (amacGFP)"
+    if title == "cgreGFP":
+        title = r"GFP from $\mathit{C.\ gregaria}$ (cgreGFP)"
+    if title == "ppluGFP":
+        title = r"GFP from $\mathit{P.\ plumata}$ (ppluGFP)"
+
+    ax.set_title(title, fontsize=20)
+    ax.set_xlabel(r"Spearman $\rho$ (all genotypes)", fontsize=18)
+    ax.set_ylabel(r"Spearman $\rho$ (epistatic genotypes)", fontsize=18)
+    ax.set_xlim(xlim); ax.set_ylim(ylim)
+    ax.set_aspect("equal", adjustable="box")
+    ax.tick_params(axis='both', which='both', labelsize=18)
+    ax.grid(True, linestyle="--", alpha=0.6)
+    plt.tight_layout()
+    
+
+def _resolve_cols(df: pd.DataFrame, dataset_key: str) -> tuple[str, str]:
+    """Return('<dataset_key>_all','<dataset_key>_epistatic') with robust matching."""
+    def _resolve(col_suffix: str) -> str:
+        exact = f"{dataset_key}{col_suffix}"
+        if exact in df.columns:
+            return exact
+        cand = [c for c in df.columns
+                if c.lower().endswith(col_suffix.lower())
+                and dataset_key.lower() in c.lower()]
+        if len(cand) == 1:
+            return cand[0]
+        if len(cand) == 0:
+            raise KeyError(
+                f"No column matching '{dataset_key}{col_suffix}' "
+                f"or containing '{dataset_key}' with suffix '{col_suffix}'."
+            )
+        raise KeyError(f"Multiple matches for '{dataset_key}{col_suffix}': {cand}")
+    return _resolve("_all"), _resolve("_epistatic")
+
+
+def collect_topk_and_baselines(
+    df: pd.DataFrame,
+    dataset_key: str,
+    *,
+    abs_vals: bool = False,
+    top_k: int = 5,
+    exclude_baselines_in_topk: bool = True,
+) -> pd.DataFrame:
+    """
+    Return a table with rows:
+      - Top-K (by epistatic Spearman) non-baseline models
+      - Baselines: MLP, Linear_regression (included even if NaN)
+    Columns: dataset_key, dataset_pretty, model, group, rank_in_topk, spearman_all, spearman_epistatic
+    """
+    col_all, col_epi = _resolve_cols(df, dataset_key)
+
+    x = pd.to_numeric(df[col_all], errors="coerce").to_numpy()
+    y = pd.to_numeric(df[col_epi], errors="coerce").to_numpy()
+    names = df.index.to_numpy(object)
+
+    if abs_vals:
+        x = np.abs(x); y = np.abs(y)
+
+    valid = np.isfinite(x) & np.isfinite(y)
+    x_ok, y_ok, names_ok = x[valid], y[valid], names[valid]
+
+    order = np.argsort(-y_ok)  # descending epistatic Spearman
+    if exclude_baselines_in_topk:
+        order = [i for i in order if names_ok[i] not in {"MLP", "Linear_regression"}]
+
+    pick = order[:min(top_k, len(order))]
+
+    rows = []
+    # Top-K non-baselines
+    for rank, idx in enumerate(pick, start=1):
+        rows.append({
+            "dataset_key": dataset_key,
+            "model": names_ok[idx],
+            "group": "top_k",
+            "rank_in_topk": rank,
+            "spearman_all": float(x_ok[idx]),
+            "spearman_epistatic": float(y_ok[idx]),
+        })
+
+    # Baselines (use original arrays to include even if NaN)
+    for base in ["MLP", "Linear_regression"]:
+        if base in names:
+            bidx = int(np.where(names == base)[0][0])
+            rows.append({
+                "dataset_key": dataset_key,
+                "model": base,
+                "group": "baseline",
+                "rank_in_topk": np.nan,
+                "spearman_all": float(x[bidx]) if np.isfinite(x[bidx]) else np.nan,
+                "spearman_epistatic": float(y[bidx]) if np.isfinite(y[bidx]) else np.nan,
+            })
+
+    out = pd.DataFrame(rows)
+
+    # add pretty names
+    try:
+        from .utils import convert_name_tsuboyama, convert_name_to_gfp
+        if "_Tsuboyama_" in dataset_key:
+            out["dataset_pretty"] = convert_name_tsuboyama(dataset_key)
+        else:
+            out["dataset_pretty"] = convert_name_to_gfp(dataset_key)
+    except Exception:
+        out["dataset_pretty"] = dataset_key
+
+    return out
+    
+    
+from pathlib import Path
+from typing import Union, Optional, Tuple, List
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+# assumes models_dotplot_single and convert_name_to_gfp are already imported in this module
+
+def models_dotplot_triplet(
+    csv_path: Union[str, Path],
+    dataset_keys: Optional[List[str]] = None,   # e.g. ["D7PM05_CLYGR_Somermeyer_2022", ...]
+    out_png: Optional[Union[str, Path]] = None,
+    out_pdf: Optional[Union[str, Path]] = None,
+    figsize: Tuple[int, int] = (18, 6),
+    abs_vals: bool = False,
+    share_limits: bool = True,
+    point_size: int = 80,
+    alpha: float = 0.75,
+    # --- NEW: combined table options ---
+    out_table_csv: Optional[Union[str, Path]] = None,  # save one combined table for the 3 datasets
+    top_k: int = 5,
+    exclude_baselines_in_topk: bool = True,
+):
+    """
+    Build a 1×3 figure of dotplots for three datasets using column bases as-is.
+    Titles are pretty-printed via convert_name_to_gfp(base).
+
+    NEW: if out_table_csv is provided, also save a combined table of Top-K (by epistatic)
+         and baselines (MLP, Linear_regression) for the three datasets.
+    """
+    csv_path = Path(csv_path)
+    df = pd.read_csv(csv_path, index_col=0)
+
+    bases_all = {c[:-4] for c in df.columns if c.endswith("_all")}
+    bases_epi = {c[:-10] for c in df.columns if c.endswith("_epistatic")}
+    available = sorted(bases_all & bases_epi)
+    if len(available) < 3:
+        raise ValueError(f"Need at least 3 dataset bases with both suffixes; found {len(available)}: {available}")
+
+    if dataset_keys is None:
+        use = available[:3]
+    else:
+        missing = [b for b in dataset_keys if b not in available]
+        if missing:
+            raise KeyError(f"Requested bases not found (need both columns): {missing}\nAvailable: {available}")
+        if len(dataset_keys) != 3:
+            raise ValueError(f"Provide exactly 3 dataset_keys; got {len(dataset_keys)}.")
+        use = dataset_keys
+
+    # collect per-panel data for shared limits and for the combined table
+    x_list, y_list = [], []
+    panel_arrays = {}  # base -> (x, y, names)
+    for base in use:
+        x = pd.to_numeric(df[f"{base}_all"], errors="coerce").to_numpy()
+        y = pd.to_numeric(df[f"{base}_epistatic"], errors="coerce").to_numpy()
+        if abs_vals:
+            x = np.abs(x); y = np.abs(y)
+        m = np.isfinite(x) & np.isfinite(y)
+        x, y = x[m], y[m]
+        names = df.index.to_numpy(dtype=object)[m]
+        x_list.append(x); y_list.append(y)
+        panel_arrays[base] = (x, y, names)
+
+    if share_limits:
+        if abs_vals:
+            lo, hi = 0.0, 1.0
+        else:
+            vals = [v for arr in (x_list + y_list) for v in (arr if arr.size else [])]
+            lo = max(-1.0, (min(vals) if len(vals) else -1.0))
+            hi = min( 1.0, (max(vals) if len(vals) else  1.0))
+            pad = 0.02 * (hi - lo if hi > lo else 1.0)
+            lo, hi = lo - pad, hi + pad
+        xlim = ylim = (lo, hi)
+    else:
+        xlim = ylim = None  # models_dotplot_single expects tuples; keep share_limits=True for safety
+
+    fig, axes = plt.subplots(1, 3, figsize=figsize)
+    for ax, base in zip(axes, use):
+        pretty_title = convert_name_to_gfp(base)
+        # keep plot behavior unchanged
+        models_dotplot_single(
+            ax=ax,
+            csv_path=csv_path,
+            dataset_key=base,          # lookup by raw base
+            title=pretty_title,        # title uses convert_name_to_gfp
+            abs_vals=abs_vals,
+            xlim=xlim,
+            ylim=ylim,
+            point_size=point_size,
+            alpha=alpha,
+            out_topk_csv=f"{base}.csv"  # per-panel CSV, unchanged
+        )
+
+    plt.tight_layout()
+    if out_png is not None:
+        Path(out_png).parent.mkdir(parents=True, exist_ok=True)
+        fig.savefig(out_png, dpi=300, bbox_inches="tight")
+        plt.close(fig)
+    elif out_pdf is not None:
+        Path(out_pdf).parent.mkdir(parents=True, exist_ok=True)
+        fig.savefig(out_pdf, bbox_inches="tight")
+        plt.close(fig)
+    else:
+        plt.show()
+
+    # --- NEW: build one combined table (Top-K + baselines) across the 3 datasets ---
+    if out_table_csv is not None:
+        rows = []
+        for base in use:
+            x, y, names = panel_arrays[base]
+            # order by epistatic desc
+            order = np.argsort(-y)
+            if exclude_baselines_in_topk:
+                order = [i for i in order if names[i] not in {"MLP", "Linear_regression"}]
+            k = min(top_k, len(order))
+            top_idx = np.array(order[:k], dtype=int) if k > 0 else np.array([], dtype=int)
+
+            # Top-K entries with rank among non-baselines
+            for rank, idx in enumerate(top_idx, start=1):
+                rows.append({
+                    "dataset_key": base,
+                    "dataset_pretty": convert_name_to_gfp(base) if 'convert_name_to_gfp' in globals() else base,
+                    "model": names[idx],
+                    "spearman_all": x[idx],
+                    "spearman_epistatic": y[idx],
+                    "group": "top_k",
+                    "rank_epistatic": rank,
+                })
+
+            # Baselines (include even if NaN was dropped earlier — read from full df)
+            for base_model in ["MLP", "Linear_regression"]:
+                if base_model in df.index:
+                    xa = pd.to_numeric(df.loc[base_model, f"{base}_all"], errors="coerce")
+                    ya = pd.to_numeric(df.loc[base_model, f"{base}_epistatic"], errors="coerce")
+                    rows.append({
+                        "dataset_key": base,
+                        "dataset_pretty": convert_name_to_gfp(base) if 'convert_name_to_gfp' in globals() else base,
+                        "model": base_model,
+                        "spearman_all": float(np.abs(xa) if abs_vals and np.isfinite(xa) else xa),
+                        "spearman_epistatic": float(np.abs(ya) if abs_vals and np.isfinite(ya) else ya),
+                        "group": "baseline",
+                        "rank_epistatic": np.nan,
+                    })
+
+        table = pd.DataFrame(rows)
+        Path(out_table_csv).parent.mkdir(parents=True, exist_ok=True)
+        table.to_csv(out_table_csv, index=False)
+
+    return fig, axes, use
+
+
+def models_dotplot_tsuboyama(
+    csv_path: Union[str, Path],
+    out_png: Optional[Union[str, Path]] = None,
+    out_pdf: Optional[Union[str, Path]] = None,
+    abs_vals: bool = False,
+    rows: int = 7,
+    cols: int = 7,
+    point_size: int = 50,
+    alpha: float = 0.75,
+    counts_csv: Optional[Union[str, Path]] = None,   # 2-row CSV you showed (header=dataset keys, row 'counts')
+    thr_mid: int = 200,                               # >200 -> light yellow
+    thr_hi: int = 400,                                # >400 -> light green
+    color_mid: str = "#fff7cc",                       # light yellow
+    color_hi: str = "#eaffea",                        # light green
+    list_topk_in_legend: bool = True,
+    # --- NEW: combined table options ---
+    out_table_csv: Optional[Union[str, Path]] = None, # save Top-K+baselines for all panels
+    top_k: int = 5,
+    exclude_baselines_in_topk: bool = True,
+):
+    """
+    7×7 grid of scatter plots:
+      x = Spearman rho (…_all), y = Spearman rho (…_epistatic)
+    Titles unchanged in size. Axis labels only on left column (y) and bottom row (x).
+    Global axis limits shared across all panels.
+
+    Background coloring (if counts_csv provided):
+      count > thr_hi  -> color_hi
+      count > thr_mid -> color_mid
+
+    Also writes one combined table of Top-K (by epistatic) and baselines per dataset if out_table_csv is set.
+    """
+
+    csv_path = Path(csv_path)
+    df = pd.read_csv(csv_path, index_col=0)
+
+    # datasets that have both columns
+    bases_all = {c[:-4]  for c in df.columns if c.endswith("_all")}
+    bases_epi = {c[:-10] for c in df.columns if c.endswith("_epistatic")}
+    bases = sorted(bases_all & bases_epi)
+
+    need = rows * cols
+    if len(bases) < need:
+        raise ValueError(f"Need at least {need} datasets with both _all and _epistatic; found {len(bases)}.")
+    bases = bases[:need]
+
+    # counts for backgrounds
+    counts_map = {}
+    if counts_csv is not None:
+        cc = pd.read_csv(counts_csv, index_col=0)
+        if "counts" in cc.index:
+            s = cc.loc["counts"]
+        else:
+            s = cc.iloc[0]
+        s = pd.to_numeric(s, errors="coerce")
+        counts_map = s.to_dict()  # keys must match 'base' strings
+
+    # global axis limits
+    xs, ys = [], []
+    for base in bases:
+        xv = pd.to_numeric(df[f"{base}_all"], errors="coerce").to_numpy()
+        yv = pd.to_numeric(df[f"{base}_epistatic"], errors="coerce").to_numpy()
+        if abs_vals:
+            xv, yv = np.abs(xv), np.abs(yv)
+        m = np.isfinite(xv) & np.isfinite(yv)
+        xs.append(xv[m]); ys.append(yv[m])
+
+    if abs_vals:
+        xlim = ylim = (0.0, 1.0)
+    else:
+        allv = np.concatenate([*xs, *ys]) if (xs and ys) else np.array([])
+        if allv.size:
+            lo = max(-1.0, float(np.nanmin(allv)))
+            hi = min( 1.0, float(np.nanmax(allv)))
+            pad = 0.02 * (hi - lo if hi > lo else 1.0)
+        else:
+            lo, hi, pad = -1.0, 1.0, 0.0
+        xlim = ylim = (lo - pad, hi + pad)
+
+    fig, axes = plt.subplots(rows, cols, figsize=(cols*6, rows*6))
+    axes = np.asarray(axes).reshape(rows, cols)
+
+    # stash arrays for table
+    panel_arrays = {}
+
+    for k, base in enumerate(bases):
+        r, c = divmod(k, cols)
+        ax = axes[r, c]
+
+        # background
+        cnt = counts_map.get(base, np.nan)
+        if np.isfinite(cnt):
+            if cnt > thr_hi:
+                ax.set_facecolor(color_hi)
+            elif cnt > thr_mid:
+                ax.set_facecolor(color_mid)
+
+        title = convert_name_tsuboyama(base)
+
+        # draw single panel
+        models_dotplot_single(
+            ax=ax,
+            csv_path=csv_path,
+            dataset_key=base,
+            title=title,
+            abs_vals=abs_vals,
+            xlim=xlim,
+            ylim=ylim,
+            point_size=point_size,
+            alpha=alpha,
+            top_k=top_k,
+            list_topk_in_legend=list_topk_in_legend,
+        )
+
+        # keep arrays for table
+        x_all = pd.to_numeric(df[f"{base}_all"], errors="coerce").to_numpy()
+        y_epi = pd.to_numeric(df[f"{base}_epistatic"], errors="coerce").to_numpy()
+        if abs_vals:
+            x_all = np.abs(x_all); y_epi = np.abs(y_epi)
+        names = df.index.to_numpy(dtype=object)
+        m = np.isfinite(x_all) & np.isfinite(y_epi)
+        panel_arrays[base] = (x_all[m], y_epi[m], names[m])
+
+        # edge labels only
+        if c != 0:
+            ax.set_ylabel("")
+        if r != rows - 1:
+            ax.set_xlabel("")
+
+    # hide unused axes
+    for k in range(len(bases), rows*cols):
+        r, c = divmod(k, cols)
+        axes[r, c].axis("off")
+
+    plt.tight_layout()
+    if out_png:
+        Path(out_png).parent.mkdir(parents=True, exist_ok=True)
+        fig.savefig(out_png, dpi=300, bbox_inches="tight")
+    if out_pdf:
+        Path(out_pdf).parent.mkdir(parents=True, exist_ok=True)
+        fig.savefig(out_pdf, bbox_inches="tight")
+
+    # build combined table (Top-K + baselines) if requested
+    if out_table_csv is not None:
+        rows_out = []
+        for base in bases:
+            x, y, names = panel_arrays[base]
+            # rank by epistatic descending
+            order = np.argsort(-y)
+            if exclude_baselines_in_topk:
+                order = [i for i in order if names[i] not in {"MLP", "Linear_regression"}]
+            ksel = min(top_k, len(order))
+            top_idx = np.array(order[:ksel], dtype=int) if ksel > 0 else np.array([], dtype=int)
+
+            for rank, idx in enumerate(top_idx, start=1):
+                rows_out.append({
+                    "dataset_key": base,
+                    "dataset_pretty": convert_name_tsuboyama(base),
+                    "model": names[idx],
+                    "spearman_all": x[idx],
+                    "spearman_epistatic": y[idx],
+                    "group": "top_k",
+                    "rank_epistatic": rank,
+                })
+
+            # baselines from full df (even if NaN originally)
+            for base_model in ["MLP", "Linear_regression"]:
+                if base_model in df.index:
+                    xa = pd.to_numeric(df.loc[base_model, f"{base}_all"], errors="coerce")
+                    ya = pd.to_numeric(df.loc[base_model, f"{base}_epistatic"], errors="coerce")
+                    if abs_vals and np.isfinite(xa): xa = float(abs(xa))
+                    if abs_vals and np.isfinite(ya): ya = float(abs(ya))
+                    rows_out.append({
+                        "dataset_key": base,
+                        "dataset_pretty": convert_name_tsuboyama(base),
+                        "model": base_model,
+                        "spearman_all": xa,
+                        "spearman_epistatic": ya,
+                        "group": "baseline",
+                        "rank_epistatic": np.nan,
+                    })
+
+        table = pd.DataFrame(rows_out)
+        Path(out_table_csv).parent.mkdir(parents=True, exist_ok=True)
+        table.to_csv(out_table_csv, index=False)
+
+    return fig, axes, bases
