@@ -1,137 +1,112 @@
-# Beyond Additivity: The Challenge of Predicting Epistatic Effects in Proteins
+# Beyond Additivity: The Challenge of Predicting Epistatic Effects in Proteins  
 
-**Authors:** Anastasia Kolchina<sup>1,2</sup>, Fyodor Kondrashov<sup>3</sup>, Olga V. Kalinina<sup>1,2</sup>  
-**Affiliations:**  
-1. Helmholtz Institute for Pharmaceutical Research Saarland (HIPS), Helmholtz Centre for Infection Research (HZI), Saarbrücken, Germany  
-2. Center for Bioinformatics, Saarland University, Saarbrücken, Germany  
-3. Okinawa Institute of Science and Technology, Okinawa, Japan  
+Authors:  
+Anastasia Kolchina1,2, Igors Dubanevics3, Fyodor A. Kondrashov3, Olga V. Kalinina1,2,4  
 
----
-
-## 📖 Overview
-This repository contains the code and example data for the analysis presented in our *Nature Methods – Analysis* submission:  
-> **Beyond Additivity: The Challenge of Predicting Epistatic Effects in Proteins**  
-
-We benchmark the ability of **95 zero-shot variant effect prediction (VEP) models** from [ProteinGym](https://proteingym.org/) to predict epistatic effects — cases where the combined effect of multiple mutations is not simply the sum of their individual effects. Our results show that while zero-shot models perform reasonably on non-epistatic combinations, their performance drops sharply for strongly epistatic variants.
+Affiliations:  
+1 Research Group Drug Bioinformatics, Helmholtz Institute for Pharmaceutical Research Saarland (HIPS), Helmholtz Centre for Infection Research (HZI), 66123 Saarbrücken, Germany  
+2 Center for Bioinformatics, Saarland University, Saarbrücken, Germany  
+3 Evolutionary and Synthetic Biology Unit, Okinawa Institute of Science and Technology Graduate University, 1919-1 Tancha, Onna-son, Okinawa 904-0495, Japan  
+4 Medical Faculty, Saarland University, Homburg, Germany  
 
 ---
 
-## 📂 Repository structure
-```
+## Overview
+
+This repository contains the code accompanying our Nature Methods – Analysis submission:
+
+Beyond Additivity: The Challenge of Predicting Epistatic Effects in Proteins
+
+We benchmark 95 zero-shot variant effect prediction (VEP) models from ProteinGym for their ability to predict epistatic effects — cases where the combined impact of multiple mutations deviates from the sum of individual effects.
+
+While zero-shot models perform reasonably on non-epistatic variant combinations, their predictive power drops substantially for strongly epistatic variants.
+
+---
+
+## Repository structure
+
 .
-├── src/                     # Analysis scripts and helper functions
+├── external/
+│   └── tsuboyama/
+│       ├── additive_model.py
+│       ├── protease-pipeline.yml
+│       └── README.md
+│
+├── notebooks/
+│   ├── 01_datasets_exploration.ipynb
+│   ├── 02_epistasis_detection.ipynb
+│   └── 03_model_performance.ipynb
+│
+├── results/
+│   ├── figures/
+│   │   ├── main/
+│   │   └── supplementary/
+│   └── tables/
+│       ├── final/
+│       │   ├── main/
+│       │   └── supplementary/
+│       └── intermediate/
+│
+├── scripts/
+│   ├── download_data.sh
+│   └── prepare_data.py
+│
+├── src/
 │   ├── data_processing.py
 │   ├── epistasis_detection.py
 │   └── model_evaluation.py
 │
-├── notebooks/               # Jupyter notebooks for figures and exploratory analysis
-│   ├── 01_explore_datasets.ipynb
-│   ├── 02_epistasis_detection.ipynb
-│   └── 03_model_performance.ipynb
-│
-├── figures/                  # Final figures used in the paper
-│   ├── fig1_dataset_overview.png
-│   ├── fig2_epistasis_thresholds.png
-│   └── fig3_model_comparison.png
-│
-├── data/                     # Example or sample datasets (no large files)
-│   └── README.md             # Instructions for downloading full datasets
-│
-├── environment.yml           # Conda environment with dependencies
-├── LICENSE                   # License file (MIT)
-└── README.md                 # This file
-```
+├── environment.yml
+├── LICENSE
+└── README.md
 
 ---
 
-## 🚀 Installation
-Clone the repository:
-```bash
-git clone https://github.com/<your-username>/<repo-name>.git
-cd <repo-name>
-```
+## Installation
 
-Create the conda environment:
-```bash
-conda env create -f environment.yml
-conda env create -f external/tsuboyama/protease-pipeline.yml 
-conda activate epistasis
-pip install ipykernel
-python -m ipykernel install --user --name=epi_env --display-name "Python (epi_env)"
+git clone https://github.com/kalininalab/epistasis_proteingym.git  
+cd epistasis_proteingym  
+
+conda env create -f environment.yml  
+conda env create -f external/tsuboyama/protease-pipeline.yml  
+conda activate epi_env  
+python -m ipykernel install --user --name=epi_env --display-name "Python (epi_env)"  
 pip install -e .
-```
 
 ---
 
-## 📊 Data
-The datasets used in this study are from the **ProteinGym** benchmark (June 2025 revision):  
-🔗 [https://proteingym.org/](https://proteingym.org/)  
+## Data
 
-We include **small sample files** in `data/` for demonstration.  
-Due to size limits, full datasets must be downloaded manually (instructions in `data/README.md`).
-
-DOWNLOAD:
-- zero_shot_substitutions_score/
-- amacGFP_cgreGFP_ppluGFP2__final_aminoacid_genotypes_to_brightness.csv
-- Tsuboyama2023_Dataset2_Dataset3_20230416.csv
-- protein_seqs.fa
-to data folder 
-TODO do it automatically (as people are stupid)
+bash scripts/download_data.sh  
+python scripts/prepare_data.py  
 
 ---
 
-## ⚙️ Reproducing the analysis
-1. **Download the full datasets** as described in `data/README.md`. 
-2. git clone https://github.com/username/epistasis-paper.git
-cd epistasis-paper
-pip install -e . 
-3. Run preprocessing:
-```bash
-python src/data_processing.py
-```
-1. Detect epistatic variants:
-```bash
-python src/epistasis_detection.py
-```
-1. Evaluate model performance:
-```bash
-python src/model_evaluation.py
-```
-1. Generate figures:
-```bash
-jupyter nbconvert --to notebook --execute notebooks/03_model_performance.ipynb
-```
+## Reproducing the analysis
 
-### results/tables/final
-Contains tables used directly in the main text and supplementary materials.
+Run notebooks in order using kernel epi_env:
 
-### results/tables/intermediate
-Contains intermediate results generated by the analysis pipeline but not shown in the publication.  
-These can be regenerated by running the provided notebooks/scripts.
-
-# Tsuboyama module (external)
-
-Purpose: reproduce ΔG reconstruction and thresholds used in Tsuboyama et al.
-
-Environment:
-conda env create -f environment.yml -n tsuboyama
-conda activate tsuboyama
-
-Run:
-python scripts/run_tsuboyama.py --input data/... --out results/tables/tsuboyama_...
-
-Attribution:
-Code adapted from <paper/repo>. License: <MIT/GPL/...>. See LICENSE or link.
+01_datasets_exploration.ipynb  
+02_epistasis_detection.ipynb  
+03_model_performance.ipynb  
 
 ---
 
-## 📄 License
-This project is licensed under the MIT License — see the [LICENSE](LICENSE) file for details.
+## Tsuboyama module
+
+Reproduces ΔG reconstruction and thresholds from Tsuboyama et al.  
+Used automatically within the analysis notebooks.  
+See external/tsuboyama for attribution and license.
 
 ---
 
-## ✏️ Citation
-If you use this code or data in your research, please cite:
+## License
 
-Kolchina, A., Kondrashov, F., Kalinina, O.V.  
-**Beyond Additivity: The Challenge of Predicting Epistatic Effects in Proteins**, *Nature Methods – Analysis*, 2025.
+MIT License.
+
+---
+
+## Citation
+
+Kolchina A., Dubanevics I., Kondrashov F.A., Kalinina O.V.  
+Beyond Additivity: The Challenge of Predicting Epistatic Effects in Proteins, Nature Methods – Analysis, 2025
