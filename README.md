@@ -68,16 +68,21 @@ While zero-shot models perform reasonably well on non-epistatic variant combinat
 
 Clone the repository:
 
+
+```text
 git clone https://github.com/kalininalab/epistasis_proteingym.git
 cd epistasis_proteingym
+```
 
 Create the conda environments:
 
+```text
 conda env create -f environment.yml
 conda env create -f external/tsuboyama/protease-pipeline.yml
 conda activate epi_env
 python -m ipykernel install --user --name=epi_env --display-name "Python (epi_env)"
 pip install -e .
+```
 
 ---
 
@@ -85,12 +90,15 @@ pip install -e .
 
 Download datasets:
 
+```text
 bash scripts/download_data.sh
+```
 
 Prepare data:
 
+```text
 python scripts/prepare_data.py
-
+```
 
 ---
 
