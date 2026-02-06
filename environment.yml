@@ -7,12 +7,12 @@ channels:
   - defaults
 dependencies:
   - pandas
-  - seaborn
+  - seaborn=0.13.2
   - jupyter
   - torchvision
   - biopython
   - pytorch
-  - matplotlib
+  - matplotlib=3.10.0
   - python=3.10
   - numpy
   - scikit-learn
