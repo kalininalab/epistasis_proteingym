@@ -1,4 +1,4 @@
-# Beyond Additivity: The Challenge of Predicting Epistatic Effects in Proteins  
+# Beyond Additivity: Zero-shot Methods Cannot Predict Impact of Epistasis on Protein Properties and Function 
 
 **Authors:**  
 Anastasia Kolchina¹˒², Igors Dubanevics³, Fyodor A. Kondrashov³, Olga V. Kalinina¹˒²˒⁴  
@@ -13,9 +13,9 @@ Anastasia Kolchina¹˒², Igors Dubanevics³, Fyodor A. Kondrashov³, Olga V. Ka
 
 ## 📖 Overview
 
-This repository contains the code accompanying our *Nature Methods – Analysis* submission:
+This repository contains the code accompanying our *Nature Communications* submission:
 
-> **Beyond Additivity: The Challenge of Predicting Epistatic Effects in Proteins**
+> **Beyond Additivity: Zero-shot Methods Cannot Predict Impact of Epistasis on Protein Properties and Function**
 
 We benchmark **95 zero-shot variant effect prediction (VEP) models** from [ProteinGym](https://proteingym.org/) for their ability to predict epistatic effects — cases where the combined impact of multiple mutations deviates from the sum of individual effects.
 
@@ -53,9 +53,15 @@ While zero-shot models perform reasonably well on non-epistatic variant combinat
 │   └── prepare_data.py
 │
 ├── src/
+│   ├── models/
+│   │   ├── linear_regression.py
+│   │   └── mlp.py
+│   ├── analysis.py
+│   ├── constants.py
 │   ├── data_processing.py
-│   ├── epistasis_detection.py
-│   └── model_evaluation.py
+│   ├── paths.py
+│   ├── plotting.py
+│   └── utils.py
 │
 ├── environment.yml
 ├── LICENSE
@@ -143,7 +149,7 @@ MIT License — see LICENSE.
 If you use this work, please cite:
 
 Kolchina A., Dubanevics I., Kondrashov F.A., Kalinina O.V.
-Beyond Additivity: The Challenge of Predicting Epistatic Effects in Proteins,
-Nature Methods – Analysis, 2025.
+Beyond Additivity: Zero-shot Methods Cannot Predict Impact of Epistasis on Protein Properties and Function,
+2025.
 
 ---
