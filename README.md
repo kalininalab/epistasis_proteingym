@@ -110,18 +110,25 @@ python scripts/prepare_data.py
 
 ## ⚙️ Reproducing the analysis
 
-Run notebooks in order using kernel epi_env:
+Run notebooks in order using kernel ```epi_env```:
+
 	1.	01_datasets_exploration.ipynb
+
 	2.	02_epistasis_detection.ipynb
+
 	3.	03_model_performance.ipynb
 
 ---
 
+```text
 results/tables/final
+```
 
 Tables used directly in the manuscript and supplementary material.
 
+```text
 results/tables/intermediate
+```
 
 Intermediate results generated during the pipeline (fully reproducible).
 
@@ -132,7 +139,7 @@ Intermediate results generated during the pipeline (fully reproducible).
 This module reproduces ΔG reconstruction and epistasis thresholds introduced in Tsuboyama et al.
 
 Code is adapted from the original publication repository
-(see external/tsuboyama/README.md for attribution and license).
+(see ```external/tsuboyama/README.md``` for attribution and license).
 
 It is used automatically within the analysis notebooks.
 
