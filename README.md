@@ -13,13 +13,19 @@ Anastasia Kolchina¹˒², Igors Dubanevics³, Fyodor A. Kondrashov³, Olga V. Ka
 
 ## 📖 Overview
 
-This repository contains the code accompanying our *Nature Communications* submission:
+This repository contains the code accompanying our preprint:
 
 > **Beyond Additivity: Zero-shot Methods Cannot Predict Impact of Epistasis on Protein Properties and Function**
 
 We benchmark **95 zero-shot variant effect prediction (VEP) models** from [ProteinGym](https://proteingym.org/) for their ability to predict epistatic effects — cases where the combined impact of multiple mutations deviates from the sum of individual effects.
 
 While zero-shot models perform reasonably well on non-epistatic variant combinations, their predictive power drops substantially for strongly epistatic variants, highlighting current limitations of unsupervised protein language models in multi-mutation regimes.
+
+---
+
+## ❗️ ProteinGym epistatic sequences: fast access
+
+If you want to evaluate your model on the epistatic sequences we detected in ProteinGym, please use the tables from [ProteinGym](https://proteingym.org/). The column "epistatic" indicates whether the sequence is considered epistatic or not (multimutants only).
 
 ---
 
@@ -155,8 +161,7 @@ MIT License — see LICENSE.
 
 If you use this work, please cite:
 
-Kolchina A., Dubanevics I., Kondrashov F.A., Kalinina O.V.
-Beyond Additivity: Zero-shot Methods Cannot Predict Impact of Epistasis on Protein Properties and Function,
-2025.
+Kolchina, A., Dubanevics, I., Kondrashov, F. A. & Kalinina, O. V. Beyond additivity: zero-shot methods cannot predict impact of epistasis on protein properties and function. 2026.02.17.706292 Preprint at https://doi.org/10.64898/2026.02.17.706292 (2026).
+
 
 ---
