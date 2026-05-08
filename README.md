@@ -25,7 +25,7 @@ While zero-shot models perform reasonably well on non-epistatic variant combinat
 
 ## ❗️ ProteinGym epistatic sequences: fast access
 
-If you want to evaluate your model on the epistatic sequences we detected in ProteinGym, please use the tables from [```results/epistatic```](https://proteingym.org/). The column "epistatic" indicates whether the sequence is considered epistatic or not (multimutants only).
+If you want to evaluate your model on the epistatic sequences we detected in ProteinGym, please use the tables from [```results/epistatic```](https://github.com/kalininalab/epistasis_proteingym/tree/main/results/epistatic). The column "epistatic" indicates whether the sequence is considered epistatic or not (multimutants only).
 
 ---
 
