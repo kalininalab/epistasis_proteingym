@@ -19,11 +19,9 @@ def main():
         fit=pd.read_csv(dest/'couplings.csv')
     else:
         fit=d.copy(); fit['num_mutations']=2
-        # Anchor to the exact stored ProteinGym default score. The freshly computed
-        # WT path uses mixed precision and is retained for auditing, but its tiny
-        # numerical difference must not be mistaken for a conditioning effect.
+        # score_all.py defines this directly as the symmetric mean of the two
+        # mutation-order paths. Never replace it with stored_default + E_cond.
         fit['conditional_path_MM_fitness']=fit.conditional_MM_fitness
-        fit['conditional_MM_fitness']=fit.default_MM_fitness+fit.E_cond
         fit['experimental_fitness']=fit.dG; fit['experimental_coupling']=fit.thermodynamic_coupling; fit['dG']=fit.conditional_MM_fitness
         fit=mod.fill_recon_columns_full(fit,clip_predictions=False)
         diag=pd.DataFrame(fit.attrs.get('fit_diagnostics',[])); diag.to_csv(dest/'fit_diagnostics.csv',index=False)

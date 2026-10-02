@@ -75,13 +75,16 @@ def score(path,tok,model,device,batch_size):
         delta=lambda key,m: float(lp[key][ai[m[2]]]-lp[key][ai[m[0]]])
         da0,da_b,db0,db_a=delta(kk[0],a),delta(kk[1],a),delta(kk[2],b),delta(kk[3],b)
         eba=da_b-da0; eab=db_a-db0; ec=.5*(eba+eab)
+        # Define the conditional score directly as the symmetric mean of the
+        # two mutation-order paths; do not depend on a stored default score.
+        s_cond=.5*((da0+db_a)+(db0+da_b))
         out.append(dict(dataset=path.stem,mutant=row.mutant,mutated_sequence=row.mutated_sequence,
           pair_name=row.pair_name,dG=row.dG,thermodynamic_coupling=row.thermodynamic_coupling,
           epistatic=row.epistatic,default_MM_fitness=row.ESM2_650M,
           mutation_A=f'{a[0]}{a[1]+1}{a[2]}',mutation_B=f'{b[0]}{b[1]+1}{b[2]}',
           delta_A_WT=da0,delta_A_B=da_b,delta_B_WT=db0,delta_B_A=db_a,
           E_B_to_A=eba,E_A_to_B=eab,E_cond=ec,
-          recomputed_default_MM_fitness=da0+db0,conditional_MM_fitness=da0+db0+ec))
+          recomputed_default_MM_fitness=da0+db0,conditional_MM_fitness=s_cond))
     OUT.mkdir(parents=True,exist_ok=True); tmp=dest.with_suffix('.tmp.csv')
     pd.DataFrame(out).to_csv(tmp,index=False); tmp.replace(dest)
     print('wrote',path.stem,len(out),flush=True)

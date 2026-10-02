@@ -1,0 +1,8 @@
+{
+  "n_assays": 50,
+  "n_double_mutants": 51924,
+  "max_absolute_difference_direct_vs_current": 0.04835414886474698,
+  "mean_absolute_difference_direct_vs_current": 0.00585238428627267,
+  "rmse_direct_vs_current": 0.007883522858987572,
+  "max_identity_error_direct_vs_same_components_default_plus_Econd": 3.552713678800501e-15
+}

@@ -15,15 +15,15 @@ Direct `E_cond` improves over original epistasis in **37/49** evaluable epistati
 
 ## Score compatibility
 
-ProteinGym ESM2 masked-marginal scores and the four conditional terms use the same natural-log probability difference, `log p(mutant residue) - log p(WT residue)`. Larger values therefore have the same sign convention. The stored double-mutant score is the sum of the two WT-background masked marginals.
+The ProteinGym implementation constructs a WT-context masked-marginal table by masking each sequence position independently. Its `label_row` function loops through all substitutions in a variant and sums `log p(mutant residue) - log p(WT residue)`. Thus, for a double mutant, the ProteinGym formula is exactly `S_default_AB = ΔA_WT + ΔB_WT`. Larger values use the same sign convention as our components.
 
-Across all variants, stored versus recomputed default scores have Spearman **0.9999993**, slope **0.999882**, and mean absolute difference **0.0059** log-score units, compared with default-score SD **6.59**. The small discrepancy is consistent with mixed-precision inference and CSV precision.
+Across all variants, stored ProteinGym versus newly recomputed default scores have Spearman **0.9999993**, slope **0.999882**, and mean absolute difference **0.0059** log-score units, compared with default-score SD **6.59**. The formula is identical; the numerical discrepancy comes from a separate Hugging Face FP16 recomputation rather than the original ProteinGym fair-esm inference.
 
-Algebraically, `S_default + E_cond` equals the mean of the two mutation-order paths:
+We define the conditional score directly as the mean of the two mutation-order paths:
 
 `0.5 * [(ΔA_WT + ΔB_A) + (ΔB_WT + ΔA_B)]`.
 
-Thus adding `E_cond` is mathematically compatible: it replaces the purely WT-background additive path with the symmetric average conditional path. The analysis anchors this correction to the stored ProteinGym score to avoid treating small numerical recomputation differences as biological interaction.
+By algebra, this direct score also equals `(ΔA_WT + ΔB_WT) + E_cond` when every term comes from the same forward-pass implementation. It should not be constructed by mixing the stored ProteinGym score with newly recomputed `E_cond`, because the two implementations have small numerical differences.
 
 ## Outputs
 
