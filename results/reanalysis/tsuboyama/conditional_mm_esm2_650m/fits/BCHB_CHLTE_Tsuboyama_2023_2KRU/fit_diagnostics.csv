@@ -1,0 +1,3 @@
+pair_name,n,divergences,mean_accept_prob,max_num_steps
+2KRU.pdb_hnet0,353,0,0.8475300073623657,63
+2KRU.pdb_hnet1,329,0,0.8310479521751404,15

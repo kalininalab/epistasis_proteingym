@@ -1,0 +1,4 @@
+pair_name,n,divergences,mean_accept_prob,max_num_steps
+6ACV.pdb_hnet0,348,0,0.8266284465789795,183
+6ACV.pdb_hnet1,273,0,0.9033394455909729,223
+6ACV.pdb_hnet2,340,0,0.8705154657363892,23

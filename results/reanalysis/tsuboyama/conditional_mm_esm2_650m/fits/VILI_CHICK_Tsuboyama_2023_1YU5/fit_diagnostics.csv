@@ -1,0 +1,5 @@
+pair_name,n,divergences,mean_accept_prob,max_num_steps
+1YU5.pdb_dmutv5_36F:44R,283,0,0.8031085729598999,31
+1YU5.pdb_hnet0,361,0,0.912010669708252,423
+1YU5.pdb_hnet1,361,0,0.8894155621528625,39
+1YU5.pdb_hnet2,361,0,0.8978115916252136,39

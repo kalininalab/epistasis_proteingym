@@ -1,0 +1,4 @@
+pair_name,n,divergences,mean_accept_prob,max_num_steps
+1TG0.pdb_dmutv5_10F:38W,277,0,0.7264028191566467,559
+1TG0.pdb_dmutv5_39Y:57K,348,0,0.906350314617157,111
+1TG0.pdb_hnet0,360,0,0.7569166421890259,159

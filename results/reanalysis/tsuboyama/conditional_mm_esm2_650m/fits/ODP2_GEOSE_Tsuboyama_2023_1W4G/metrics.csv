@@ -1,0 +1,5 @@
+dataset,subset,task,n,default_rho,conditional_rho
+ODP2_GEOSE_Tsuboyama_2023_1W4G,all_doubles,fitness,465,0.04741080933989603,0.057867945786209775
+ODP2_GEOSE_Tsuboyama_2023_1W4G,all_doubles,epistasis,465,-0.12025647922033891,-0.08295901024982458
+ODP2_GEOSE_Tsuboyama_2023_1W4G,epistatic,fitness,4,0.7999999999999999,0.7999999999999999
+ODP2_GEOSE_Tsuboyama_2023_1W4G,epistatic,epistasis,4,-0.7999999999999999,-1.0

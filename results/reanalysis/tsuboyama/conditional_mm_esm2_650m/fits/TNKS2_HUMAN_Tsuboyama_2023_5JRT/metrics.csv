@@ -1,0 +1,5 @@
+dataset,subset,task,n,default_rho,conditional_rho
+TNKS2_HUMAN_Tsuboyama_2023_5JRT,all_doubles,fitness,361,0.0642524091560684,0.15178652505063178
+TNKS2_HUMAN_Tsuboyama_2023_5JRT,all_doubles,epistasis,361,-0.018264134359872685,0.12071823204419888
+TNKS2_HUMAN_Tsuboyama_2023_5JRT,epistatic,fitness,1,,
+TNKS2_HUMAN_Tsuboyama_2023_5JRT,epistatic,epistasis,1,,

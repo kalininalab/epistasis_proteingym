@@ -1,0 +1,5 @@
+pair_name,n,divergences,mean_accept_prob,max_num_steps
+2KVT.pdb_dmutv5_11K:20W,338,0,0.8607564568519592,223
+2KVT.pdb_dmutv5_6I:21Y,65,0,0.8837084174156189,191
+2KVT.pdb_hnet0,250,0,0.7540926337242126,23
+2KVT.pdb_hnet1,309,0,0.7269778251647949,239

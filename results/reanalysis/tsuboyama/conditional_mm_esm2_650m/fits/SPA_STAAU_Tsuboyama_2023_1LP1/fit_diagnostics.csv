@@ -1,0 +1,4 @@
+pair_name,n,divergences,mean_accept_prob,max_num_steps
+1LP1.pdb_hnet0,361,0,0.7254881858825684,55
+1LP1.pdb_hnet1,361,0,0.7261513471603394,279
+1LP1.pdb_hnet2,348,0,0.7484155297279358,135
