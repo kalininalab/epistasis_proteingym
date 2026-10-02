@@ -13,6 +13,8 @@ def rho(x,y):
 def main():
     p=argparse.ArgumentParser(); p.add_argument('--scores',type=Path,required=True); p.add_argument('--output',type=Path,required=True); a=p.parse_args()
     started=time.perf_counter(); a.output.mkdir(parents=True,exist_ok=True)
+    if (a.output/'metrics.csv').exists() and (a.output/'couplings.csv').exists():
+        print(f'complete: {a.output}',flush=True); return
     spec=importlib.util.spec_from_file_location('thermo',MODEL_FILE); mod=importlib.util.module_from_spec(spec); spec.loader.exec_module(mod)
     d=pd.read_csv(a.scores); fit=d.copy(); fit['num_mutations']=2; fit['dG']=fit.PLL_AB
     fit=mod.fill_recon_columns_full(fit,clip_predictions=False)

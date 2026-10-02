@@ -71,6 +71,9 @@ def main():
         ma,mb=parse_double(row.mutant); sa=single_sequence(wt,ma); sb=single_sequence(wt,mb); sab=single_sequence(sa,mb)
         if sab!=row.mutated_sequence: raise ValueError(f'AB mismatch: {row.mutant}')
         unique.update({sa:None,sb:None,sab:None}); records.append((row,sa,sb,sab))
+    scores_path=a.output/'scores.csv'
+    if scores_path.exists() and (a.output/'runtime.json').exists():
+        print(f'complete: {a.dataset}',flush=True); return
     cache_path=a.output/'sequence_pll_cache.csv'; cache={}
     if cache_path.exists():
         prior=pd.read_csv(cache_path)
@@ -90,7 +93,7 @@ def main():
           experimental_dG=row.dG,experimental_coupling=row.thermodynamic_coupling,epistatic=row.epistatic,
           PLL_WT=pll_wt,PLL_A=pll_a,PLL_B=pll_b,PLL_AB=pll_ab,
           epsilon_PLL=pll_ab-pll_a-pll_b+pll_wt))
-    result=pd.DataFrame(out); result_tmp=a.output/'scores.tmp.csv'; result.to_csv(result_tmp,index=False); result_tmp.replace(a.output/'scores.csv')
+    result=pd.DataFrame(out); result_tmp=a.output/'scores.tmp.csv'; result.to_csv(result_tmp,index=False); result_tmp.replace(scores_path)
     runtime=dict(dataset=a.dataset,model=MODEL,n_double_mutants=len(result),n_unique_sequences=len(unique),n_cached_before=len(unique)-len(missing),
       n_scored_sequences=len(missing),n_masked_forward_examples=sum(map(len,missing)),batch_size=a.batch_size,model_load_seconds=load_seconds,
       inference_seconds=inference_seconds,total_seconds=time.perf_counter()-started,sequences_per_second=len(missing)/inference_seconds if inference_seconds else None,
