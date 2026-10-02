@@ -12,7 +12,7 @@ for i,dataset in enumerate(datasets):
     score=f'SCORE_{i:02d}'; fit=f'FIT_{i:02d}'
     dag += [f'JOB {score} {CONDOR}/score.sub',f'VARS {score} dataset="{dataset}"',f'CATEGORY {score} pll_gpu',
             f'JOB {fit} {CONDOR}/fit.sub',f'VARS {fit} dataset="{dataset}"',f'CATEGORY {fit} pll_cpu',f'PARENT {score} CHILD {fit}']
-dag += ['MAXJOBS pll_gpu 5','MAXJOBS pll_cpu 10']
+dag += ['MAXJOBS pll_gpu 10','MAXJOBS pll_cpu 10']
 (CONDOR/'analysis.dag').write_text('\n'.join(dag)+'\n')
-print(f'Prepared {len(datasets)} GPU scoring jobs (max 5 concurrent) followed by {len(datasets)} CPU fits (max 10 concurrent).')
+print(f'Prepared {len(datasets)} GPU scoring jobs (max 10 concurrent) followed by {len(datasets)} CPU fits (max 10 concurrent).')
 print(CONDOR/'analysis.dag')
