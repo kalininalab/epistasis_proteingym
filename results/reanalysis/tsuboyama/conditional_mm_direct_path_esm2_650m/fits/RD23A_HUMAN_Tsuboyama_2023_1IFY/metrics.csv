@@ -1,0 +1,3 @@
+dataset,subset,n,rho_original,rho_conditional_direct_fitted,rho_direct_E_cond
+RD23A_HUMAN_Tsuboyama_2023_1IFY,all_doubles,221,-0.05661973186095465,0.2486542074777369,0.14170189809161826
+RD23A_HUMAN_Tsuboyama_2023_1IFY,epistatic,34,0.1714678733827224,0.44904507257448434,0.19511077158135978

@@ -1,0 +1,17 @@
+{
+  "dataset": "BCHB_CHLTE_Tsuboyama_2023_2KRU",
+  "model": "facebook/esm2_t33_650M_UR50D",
+  "n_double_mutants": 682,
+  "n_unique_sequences": 759,
+  "n_cached_before": 0,
+  "n_scored_sequences": 759,
+  "n_masked_forward_examples": 39468,
+  "batch_size": 32,
+  "model_load_seconds": 32.9637836497277,
+  "inference_seconds": 1026.5528916204348,
+  "total_seconds": 1059.745240422897,
+  "sequences_per_second": 0.7393676508980487,
+  "masked_examples_per_second": 38.447117846698525,
+  "device": "cuda",
+  "dtype": "float16 autocast"
+}

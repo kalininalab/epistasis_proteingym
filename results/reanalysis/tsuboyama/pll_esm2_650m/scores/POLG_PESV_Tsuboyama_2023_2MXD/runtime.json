@@ -1,0 +1,17 @@
+{
+  "dataset": "POLG_PESV_Tsuboyama_2023_2MXD",
+  "model": "facebook/esm2_t33_650M_UR50D",
+  "n_double_mutants": 4135,
+  "n_unique_sequences": 4357,
+  "n_cached_before": 0,
+  "n_scored_sequences": 4357,
+  "n_masked_forward_examples": 230921,
+  "batch_size": 32,
+  "model_load_seconds": 22.71904005203396,
+  "inference_seconds": 6082.182158750482,
+  "total_seconds": 6105.580093169585,
+  "sequences_per_second": 0.7163547368819841,
+  "masked_examples_per_second": 37.96680105474516,
+  "device": "cuda",
+  "dtype": "float16 autocast"
+}

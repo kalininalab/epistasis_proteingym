@@ -1,0 +1,3 @@
+dataset,subset,n,rho_PLL_fitted_epistasis,rho_direct_epsilon_PLL
+SPG2_STRSG_Tsuboyama_2023_5UBS,all_doubles,422,-0.005174779649714962,-0.016463088607732383
+SPG2_STRSG_Tsuboyama_2023_5UBS,epistatic,56,0.23677375256322628,0.13513328776486672

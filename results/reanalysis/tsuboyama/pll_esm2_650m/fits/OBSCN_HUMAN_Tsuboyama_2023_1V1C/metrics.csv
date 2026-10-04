@@ -1,0 +1,3 @@
+dataset,subset,n,rho_PLL_fitted_epistasis,rho_direct_epsilon_PLL
+OBSCN_HUMAN_Tsuboyama_2023_1V1C,all_doubles,1984,0.02507879603590788,0.04676124321705652
+OBSCN_HUMAN_Tsuboyama_2023_1V1C,epistatic,433,-0.012438227917256447,-0.018165190285804156

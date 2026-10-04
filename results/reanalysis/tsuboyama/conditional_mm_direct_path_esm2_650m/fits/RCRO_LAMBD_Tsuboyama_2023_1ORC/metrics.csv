@@ -1,0 +1,3 @@
+dataset,subset,n,rho_original,rho_conditional_direct_fitted,rho_direct_E_cond
+RCRO_LAMBD_Tsuboyama_2023_1ORC,all_doubles,1083,-0.011153937360732296,0.08670213114694317,0.060497265076419726
+RCRO_LAMBD_Tsuboyama_2023_1ORC,epistatic,96,0.10240306031135668,0.2934074877916441,-0.04092512208355942

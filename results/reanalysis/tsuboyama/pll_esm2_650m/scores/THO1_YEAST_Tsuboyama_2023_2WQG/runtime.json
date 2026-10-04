@@ -1,0 +1,17 @@
+{
+  "dataset": "THO1_YEAST_Tsuboyama_2023_2WQG",
+  "model": "facebook/esm2_t33_650M_UR50D",
+  "n_double_mutants": 623,
+  "n_unique_sequences": 700,
+  "n_cached_before": 0,
+  "n_scored_sequences": 700,
+  "n_masked_forward_examples": 28700,
+  "batch_size": 32,
+  "model_load_seconds": 33.39952444192022,
+  "inference_seconds": 71.46240879036486,
+  "total_seconds": 105.10080992616713,
+  "sequences_per_second": 9.795359712173314,
+  "masked_examples_per_second": 401.60974819910587,
+  "device": "cuda",
+  "dtype": "float16 autocast"
+}

@@ -1,0 +1,17 @@
+{
+  "dataset": "OBSCN_HUMAN_Tsuboyama_2023_1V1C",
+  "model": "facebook/esm2_t33_650M_UR50D",
+  "n_double_mutants": 1984,
+  "n_unique_sequences": 2194,
+  "n_cached_before": 0,
+  "n_scored_sequences": 2194,
+  "n_masked_forward_examples": 142610,
+  "batch_size": 32,
+  "model_load_seconds": 36.21730632521212,
+  "inference_seconds": 5359.349287576042,
+  "total_seconds": 5395.988011395559,
+  "sequences_per_second": 0.4093780573485098,
+  "masked_examples_per_second": 26.609573727653135,
+  "device": "cuda",
+  "dtype": "float16 autocast"
+}

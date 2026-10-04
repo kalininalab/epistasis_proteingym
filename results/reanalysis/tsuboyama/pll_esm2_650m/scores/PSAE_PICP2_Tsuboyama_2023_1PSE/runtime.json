@@ -1,0 +1,17 @@
+{
+  "dataset": "PSAE_PICP2_Tsuboyama_2023_1PSE",
+  "model": "facebook/esm2_t33_650M_UR50D",
+  "n_double_mutants": 360,
+  "n_unique_sequences": 399,
+  "n_cached_before": 0,
+  "n_scored_sequences": 399,
+  "n_masked_forward_examples": 27132,
+  "batch_size": 32,
+  "model_load_seconds": 36.47088136244565,
+  "inference_seconds": 1061.3328018207103,
+  "total_seconds": 1098.1727952072397,
+  "sequences_per_second": 0.3759423993261282,
+  "masked_examples_per_second": 25.56408315417672,
+  "device": "cuda",
+  "dtype": "float16 autocast"
+}

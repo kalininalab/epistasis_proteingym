@@ -1,0 +1,4 @@
+pair_name,n,divergences,mean_accept_prob,max_num_steps
+1UZC.pdb_hnet0_3x_|D39X|R41Z,293,0,0.846113383769989,7
+1UZC.pdb_hnet0_3x_|E20X|D39Z,256,0,0.8641378879547119,7
+1UZC.pdb_hnet0_3x_|E20X|R41Z,321,0,0.8477853536605835,7

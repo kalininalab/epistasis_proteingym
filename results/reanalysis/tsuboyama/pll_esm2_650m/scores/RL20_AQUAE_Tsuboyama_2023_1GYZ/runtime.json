@@ -1,0 +1,17 @@
+{
+  "dataset": "RL20_AQUAE_Tsuboyama_2023_1GYZ",
+  "model": "facebook/esm2_t33_650M_UR50D",
+  "n_double_mutants": 340,
+  "n_unique_sequences": 379,
+  "n_cached_before": 0,
+  "n_scored_sequences": 379,
+  "n_masked_forward_examples": 22361,
+  "batch_size": 32,
+  "model_load_seconds": 33.696078459732234,
+  "inference_seconds": 639.262935847044,
+  "total_seconds": 673.10921260342,
+  "sequences_per_second": 0.5928702866181547,
+  "masked_examples_per_second": 34.97934691047113,
+  "device": "cuda",
+  "dtype": "float16 autocast"
+}

@@ -1,0 +1,17 @@
+{
+  "dataset": "RCRO_LAMBD_Tsuboyama_2023_1ORC",
+  "model": "facebook/esm2_t33_650M_UR50D",
+  "n_double_mutants": 1083,
+  "n_unique_sequences": 1198,
+  "n_cached_before": 0,
+  "n_scored_sequences": 1198,
+  "n_masked_forward_examples": 75474,
+  "batch_size": 32,
+  "model_load_seconds": 32.9794558538124,
+  "inference_seconds": 2730.1566480267793,
+  "total_seconds": 2763.429676202126,
+  "sequences_per_second": 0.43880266023045034,
+  "masked_examples_per_second": 27.64456759451837,
+  "device": "cuda",
+  "dtype": "float16 autocast"
+}

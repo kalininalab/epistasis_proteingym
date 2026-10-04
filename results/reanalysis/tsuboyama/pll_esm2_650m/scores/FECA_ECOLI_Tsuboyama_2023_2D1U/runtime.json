@@ -1,0 +1,17 @@
+{
+  "dataset": "FECA_ECOLI_Tsuboyama_2023_2D1U",
+  "model": "facebook/esm2_t33_650M_UR50D",
+  "n_double_mutants": 667,
+  "n_unique_sequences": 744,
+  "n_cached_before": 0,
+  "n_scored_sequences": 744,
+  "n_masked_forward_examples": 53568,
+  "batch_size": 32,
+  "model_load_seconds": 19.088289397768676,
+  "inference_seconds": 203.38090267498046,
+  "total_seconds": 222.72981420718133,
+  "sequences_per_second": 3.65816057562186,
+  "masked_examples_per_second": 263.3875614447739,
+  "device": "cuda",
+  "dtype": "float16 autocast"
+}

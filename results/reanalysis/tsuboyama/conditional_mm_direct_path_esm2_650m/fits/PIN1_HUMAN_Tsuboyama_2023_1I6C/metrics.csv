@@ -1,0 +1,3 @@
+dataset,subset,n,rho_original,rho_conditional_direct_fitted,rho_direct_E_cond
+PIN1_HUMAN_Tsuboyama_2023_1I6C,all_doubles,116,-0.04358080776014527,-0.21097912582170453,-0.14275170107254065
+PIN1_HUMAN_Tsuboyama_2023_1I6C,epistatic,27,-0.047626317147770075,-0.16544566544566544,-0.21672771672771673

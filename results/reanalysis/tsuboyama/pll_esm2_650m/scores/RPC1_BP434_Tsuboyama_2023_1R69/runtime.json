@@ -1,0 +1,17 @@
+{
+  "dataset": "RPC1_BP434_Tsuboyama_2023_1R69",
+  "model": "facebook/esm2_t33_650M_UR50D",
+  "n_double_mutants": 335,
+  "n_unique_sequences": 374,
+  "n_cached_before": 0,
+  "n_scored_sequences": 374,
+  "n_masked_forward_examples": 22814,
+  "batch_size": 32,
+  "model_load_seconds": 36.89927872642875,
+  "inference_seconds": 831.7466124715284,
+  "total_seconds": 868.8687779335305,
+  "sequences_per_second": 0.4496561745994517,
+  "masked_examples_per_second": 27.429026650566552,
+  "device": "cuda",
+  "dtype": "float16 autocast"
+}

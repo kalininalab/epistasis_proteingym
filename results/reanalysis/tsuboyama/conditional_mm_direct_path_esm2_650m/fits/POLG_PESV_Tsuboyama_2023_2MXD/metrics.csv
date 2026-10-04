@@ -1,0 +1,3 @@
+dataset,subset,n,rho_original,rho_conditional_direct_fitted,rho_direct_E_cond
+POLG_PESV_Tsuboyama_2023_2MXD,all_doubles,4135,-0.003113333935936291,0.07670944376142859,0.02043891700772379
+POLG_PESV_Tsuboyama_2023_2MXD,epistatic,480,-0.023966787256221596,0.11932191545970251,0.06253744184408844

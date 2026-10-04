@@ -1,0 +1,4 @@
+pair_name,n,divergences,mean_accept_prob,max_num_steps
+2LHR.pdb_dmutv5_27Q:39K,319,0,0.7732459902763367,55
+2LHR.pdb_hnet0,329,0,0.7303624153137207,87
+2LHR.pdb_hnet1,356,0,0.7348420023918152,111

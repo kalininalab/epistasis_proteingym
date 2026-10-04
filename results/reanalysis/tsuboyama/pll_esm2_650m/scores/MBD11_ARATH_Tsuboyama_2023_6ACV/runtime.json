@@ -1,0 +1,17 @@
+{
+  "dataset": "MBD11_ARATH_Tsuboyama_2023_6ACV",
+  "model": "facebook/esm2_t33_650M_UR50D",
+  "n_double_mutants": 961,
+  "n_unique_sequences": 1076,
+  "n_cached_before": 0,
+  "n_scored_sequences": 1076,
+  "n_masked_forward_examples": 71016,
+  "batch_size": 32,
+  "model_load_seconds": 33.22404149360955,
+  "inference_seconds": 2622.6452668802813,
+  "total_seconds": 2656.1475941268727,
+  "sequences_per_second": 0.41027279349903684,
+  "masked_examples_per_second": 27.07800437093643,
+  "device": "cuda",
+  "dtype": "float16 autocast"
+}

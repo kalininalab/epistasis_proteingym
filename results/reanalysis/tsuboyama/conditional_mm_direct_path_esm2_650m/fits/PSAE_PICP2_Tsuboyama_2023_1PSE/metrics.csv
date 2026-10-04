@@ -1,0 +1,3 @@
+dataset,subset,n,rho_original,rho_conditional_direct_fitted,rho_direct_E_cond
+PSAE_PICP2_Tsuboyama_2023_1PSE,all_doubles,360,-0.07058576007256763,0.013449177848594509,-0.01021022237526328
+PSAE_PICP2_Tsuboyama_2023_1PSE,epistatic,40,-0.16980955136181144,-0.06716697936210132,0.041275797373358354

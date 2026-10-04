@@ -1,0 +1,17 @@
+{
+  "dataset": "NUSG_MYCTU_Tsuboyama_2023_2MI6",
+  "model": "facebook/esm2_t33_650M_UR50D",
+  "n_double_mutants": 361,
+  "n_unique_sequences": 400,
+  "n_cached_before": 0,
+  "n_scored_sequences": 400,
+  "n_masked_forward_examples": 22000,
+  "batch_size": 32,
+  "model_load_seconds": 33.303175600245595,
+  "inference_seconds": 598.3821524698287,
+  "total_seconds": 631.8806179584935,
+  "sequences_per_second": 0.6684691352323857,
+  "masked_examples_per_second": 36.76580243778122,
+  "device": "cuda",
+  "dtype": "float16 autocast"
+}

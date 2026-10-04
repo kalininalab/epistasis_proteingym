@@ -1,0 +1,3 @@
+dataset,subset,n,rho_PLL_fitted_epistasis,rho_direct_epsilon_PLL
+VILI_CHICK_Tsuboyama_2023_1YU5,all_doubles,1366,0.026662944739420033,0.07384385496719632
+VILI_CHICK_Tsuboyama_2023_1YU5,epistatic,106,0.11566113308310451,0.10672342998211452

@@ -1,0 +1,5 @@
+pair_name,n,divergences,mean_accept_prob,max_num_steps
+2L9R.pdb_hnet0_3x_|Q19X|E26Z,324,0,0.8780403733253479,15
+2L9R.pdb_hnet0_3x_|Q19X|S23Z,324,0,0.873294472694397,7
+2L9R.pdb_hnet0_3x_|S23X|E26Z,324,0,0.8929255604743958,31
+2L9R.pdb_hnet1,361,0,0.8716171979904175,15

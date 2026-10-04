@@ -1,0 +1,3 @@
+dataset,subset,n,rho_original,rho_conditional_direct_fitted,rho_direct_E_cond
+YAIA_ECOLI_Tsuboyama_2023_2KVT,all_doubles,962,-0.036926146633574686,0.3796825030796652,0.09081138618046926
+YAIA_ECOLI_Tsuboyama_2023_2KVT,epistatic,244,-0.0023943978443560173,0.5696574683303801,0.09323034113361146

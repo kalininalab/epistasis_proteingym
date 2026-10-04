@@ -1,0 +1,17 @@
+{
+  "dataset": "MYO3_YEAST_Tsuboyama_2023_2BTT",
+  "model": "facebook/esm2_t33_650M_UR50D",
+  "n_double_mutants": 2350,
+  "n_unique_sequences": 2617,
+  "n_cached_before": 0,
+  "n_scored_sequences": 2617,
+  "n_masked_forward_examples": 159637,
+  "batch_size": 32,
+  "model_load_seconds": 36.46701281610876,
+  "inference_seconds": 5698.964933250099,
+  "total_seconds": 5736.163416496478,
+  "sequences_per_second": 0.4592061945725176,
+  "masked_examples_per_second": 28.011577868923574,
+  "device": "cuda",
+  "dtype": "float16 autocast"
+}

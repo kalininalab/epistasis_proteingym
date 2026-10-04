@@ -1,0 +1,17 @@
+{
+  "dataset": "EPHB2_HUMAN_Tsuboyama_2023_1F0M",
+  "model": "facebook/esm2_t33_650M_UR50D",
+  "n_double_mutants": 721,
+  "n_unique_sequences": 798,
+  "n_cached_before": 0,
+  "n_scored_sequences": 798,
+  "n_masked_forward_examples": 52668,
+  "batch_size": 32,
+  "model_load_seconds": 26.147856486961246,
+  "inference_seconds": 1944.3374874591827,
+  "total_seconds": 1970.7077964749187,
+  "sequences_per_second": 0.4104225758887202,
+  "masked_examples_per_second": 27.087890008655535,
+  "device": "cuda",
+  "dtype": "float16 autocast"
+}

@@ -1,0 +1,17 @@
+{
+  "dataset": "RBP1_HUMAN_Tsuboyama_2023_2KWH",
+  "model": "facebook/esm2_t33_650M_UR50D",
+  "n_double_mutants": 357,
+  "n_unique_sequences": 396,
+  "n_cached_before": 0,
+  "n_scored_sequences": 396,
+  "n_masked_forward_examples": 20592,
+  "batch_size": 32,
+  "model_load_seconds": 33.52869161218405,
+  "inference_seconds": 510.56921719014645,
+  "total_seconds": 544.2892374461517,
+  "sequences_per_second": 0.7756049261632659,
+  "masked_examples_per_second": 40.33145616048983,
+  "device": "cuda",
+  "dtype": "float16 autocast"
+}

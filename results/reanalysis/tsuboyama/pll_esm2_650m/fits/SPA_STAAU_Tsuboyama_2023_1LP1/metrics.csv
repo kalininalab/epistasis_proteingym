@@ -1,0 +1,3 @@
+dataset,subset,n,rho_PLL_fitted_epistasis,rho_direct_epsilon_PLL
+SPA_STAAU_Tsuboyama_2023_1LP1,all_doubles,1070,0.05429266082345444,0.0454467791155524
+SPA_STAAU_Tsuboyama_2023_1LP1,epistatic,95,0.1705767077267637,0.2037793952967525

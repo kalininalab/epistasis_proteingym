@@ -1,0 +1,4 @@
+pair_name,n,divergences,mean_accept_prob,max_num_steps
+2L7M.pdb_dmutv5_15F:47R,235,0,0.7379807829856873,103
+2L7M.pdb_hnet0,299,0,0.8461454510688782,39
+2L7M.pdb_hnet1,352,0,0.9303238391876221,247

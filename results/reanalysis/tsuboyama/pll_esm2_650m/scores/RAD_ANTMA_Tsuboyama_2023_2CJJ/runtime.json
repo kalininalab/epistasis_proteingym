@@ -1,0 +1,17 @@
+{
+  "dataset": "RAD_ANTMA_Tsuboyama_2023_2CJJ",
+  "model": "facebook/esm2_t33_650M_UR50D",
+  "n_double_mutants": 138,
+  "n_unique_sequences": 190,
+  "n_cached_before": 0,
+  "n_scored_sequences": 190,
+  "n_masked_forward_examples": 10260,
+  "batch_size": 32,
+  "model_load_seconds": 36.30306356865913,
+  "inference_seconds": 268.91267575789243,
+  "total_seconds": 305.4087374098599,
+  "sequences_per_second": 0.7065490664005027,
+  "masked_examples_per_second": 38.15364958562715,
+  "device": "cuda",
+  "dtype": "float16 autocast"
+}

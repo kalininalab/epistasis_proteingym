@@ -1,0 +1,17 @@
+{
+  "dataset": "TNKS2_HUMAN_Tsuboyama_2023_5JRT",
+  "model": "facebook/esm2_t33_650M_UR50D",
+  "n_double_mutants": 361,
+  "n_unique_sequences": 400,
+  "n_cached_before": 0,
+  "n_scored_sequences": 400,
+  "n_masked_forward_examples": 23600,
+  "batch_size": 32,
+  "model_load_seconds": 33.28016536962241,
+  "inference_seconds": 99.93083818163723,
+  "total_seconds": 133.42934851255268,
+  "sequences_per_second": 4.002768387401577,
+  "masked_examples_per_second": 236.16333485669304,
+  "device": "cuda",
+  "dtype": "float16 autocast"
+}

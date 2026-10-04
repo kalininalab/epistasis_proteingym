@@ -1,0 +1,17 @@
+{
+  "dataset": "PITX2_HUMAN_Tsuboyama_2023_2L7M",
+  "model": "facebook/esm2_t33_650M_UR50D",
+  "n_double_mutants": 886,
+  "n_unique_sequences": 982,
+  "n_cached_before": 0,
+  "n_scored_sequences": 982,
+  "n_masked_forward_examples": 51064,
+  "batch_size": 32,
+  "model_load_seconds": 33.46591142565012,
+  "inference_seconds": 1284.8103456133977,
+  "total_seconds": 1318.5410289485008,
+  "sequences_per_second": 0.7643151406374852,
+  "masked_examples_per_second": 39.74438731314923,
+  "device": "cuda",
+  "dtype": "float16 autocast"
+}

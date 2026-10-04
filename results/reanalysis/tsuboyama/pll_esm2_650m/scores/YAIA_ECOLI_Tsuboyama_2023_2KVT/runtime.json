@@ -1,0 +1,17 @@
+{
+  "dataset": "YAIA_ECOLI_Tsuboyama_2023_2KVT",
+  "model": "facebook/esm2_t33_650M_UR50D",
+  "n_double_mutants": 962,
+  "n_unique_sequences": 1107,
+  "n_cached_before": 0,
+  "n_scored_sequences": 1107,
+  "n_masked_forward_examples": 57564,
+  "batch_size": 32,
+  "model_load_seconds": 33.654751759022474,
+  "inference_seconds": 222.36141484696418,
+  "total_seconds": 256.29013193398714,
+  "sequences_per_second": 4.978381706924607,
+  "masked_examples_per_second": 258.8758487600795,
+  "device": "cuda",
+  "dtype": "float16 autocast"
+}

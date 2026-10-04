@@ -1,0 +1,3 @@
+dataset,subset,n,rho_original,rho_conditional_direct_fitted,rho_direct_E_cond
+ISDH_STAAW_Tsuboyama_2023_2LHR,all_doubles,1004,-0.009690870706147268,0.3217410502630183,0.07659130046733971
+ISDH_STAAW_Tsuboyama_2023_2LHR,epistatic,43,0.08698278465720326,0.4956206584113561,0.3743581999395953

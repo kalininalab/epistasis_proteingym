@@ -1,0 +1,17 @@
+{
+  "dataset": "DOCK1_MOUSE_Tsuboyama_2023_2M0Y",
+  "model": "facebook/esm2_t33_650M_UR50D",
+  "n_double_mutants": 1702,
+  "n_unique_sequences": 1874,
+  "n_cached_before": 0,
+  "n_scored_sequences": 1874,
+  "n_masked_forward_examples": 123684,
+  "batch_size": 32,
+  "model_load_seconds": 34.34194998536259,
+  "inference_seconds": 456.925711652264,
+  "total_seconds": 491.64451335556805,
+  "sequences_per_second": 4.101323152123638,
+  "masked_examples_per_second": 270.68732804016014,
+  "device": "cuda",
+  "dtype": "float16 autocast"
+}

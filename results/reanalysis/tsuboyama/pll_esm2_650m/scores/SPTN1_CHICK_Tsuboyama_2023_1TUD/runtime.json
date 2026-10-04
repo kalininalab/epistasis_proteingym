@@ -1,0 +1,17 @@
+{
+  "dataset": "SPTN1_CHICK_Tsuboyama_2023_1TUD",
+  "model": "facebook/esm2_t33_650M_UR50D",
+  "n_double_mutants": 2150,
+  "n_unique_sequences": 2357,
+  "n_cached_before": 0,
+  "n_scored_sequences": 2357,
+  "n_masked_forward_examples": 141420,
+  "batch_size": 32,
+  "model_load_seconds": 33.41002677101642,
+  "inference_seconds": 428.9881944814697,
+  "total_seconds": 462.872019674629,
+  "sequences_per_second": 5.494323690769564,
+  "masked_examples_per_second": 329.65942144617384,
+  "device": "cuda",
+  "dtype": "float16 autocast"
+}

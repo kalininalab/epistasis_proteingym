@@ -1,0 +1,3 @@
+pair_name,n,divergences,mean_accept_prob,max_num_steps
+2WQG.pdb_hnet0,336,0,0.8486707210540771,79
+2WQG.pdb_hnet1,287,0,0.7363742589950562,47

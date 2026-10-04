@@ -1,0 +1,17 @@
+{
+  "dataset": "YNZC_BACSU_Tsuboyama_2023_2JVD",
+  "model": "facebook/esm2_t33_650M_UR50D",
+  "n_double_mutants": 1586,
+  "n_unique_sequences": 1717,
+  "n_cached_before": 0,
+  "n_scored_sequences": 1717,
+  "n_masked_forward_examples": 66963,
+  "batch_size": 32,
+  "model_load_seconds": 33.37760078255087,
+  "inference_seconds": 162.28444884251803,
+  "total_seconds": 195.96331211179495,
+  "sequences_per_second": 10.580188134145798,
+  "masked_examples_per_second": 412.6273372316861,
+  "device": "cuda",
+  "dtype": "float16 autocast"
+}

@@ -1,0 +1,17 @@
+{
+  "dataset": "SDA_BACSU_Tsuboyama_2023_1PV0",
+  "model": "facebook/esm2_t33_650M_UR50D",
+  "n_double_mutants": 1936,
+  "n_unique_sequences": 2009,
+  "n_cached_before": 0,
+  "n_scored_sequences": 2009,
+  "n_masked_forward_examples": 88396,
+  "batch_size": 32,
+  "model_load_seconds": 37.159715946763754,
+  "inference_seconds": 2091.716500367038,
+  "total_seconds": 2129.2612668303773,
+  "sequences_per_second": 0.9604552049225966,
+  "masked_examples_per_second": 42.26002901659425,
+  "device": "cuda",
+  "dtype": "float16 autocast"
+}

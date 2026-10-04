@@ -1,0 +1,3 @@
+dataset,subset,n,rho_PLL_fitted_epistasis,rho_direct_epsilon_PLL
+CATR_CHLRE_Tsuboyama_2023_2AMI,all_doubles,563,-0.08691445585465807,0.10829272543853904
+CATR_CHLRE_Tsuboyama_2023_2AMI,epistatic,34,-0.18838808250572958,0.07043544690603513

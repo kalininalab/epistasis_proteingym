@@ -1,0 +1,3 @@
+dataset,subset,n,rho_original,rho_conditional_direct_fitted,rho_direct_E_cond
+NUSG_MYCTU_Tsuboyama_2023_2MI6,all_doubles,361,0.07869428340045348,0.41117930038821965,0.14689849752915504
+NUSG_MYCTU_Tsuboyama_2023_2MI6,epistatic,21,-0.34285714285714286,0.6844155844155844,0.17922077922077922

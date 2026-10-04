@@ -1,0 +1,17 @@
+{
+  "dataset": "VILI_CHICK_Tsuboyama_2023_1YU5",
+  "model": "facebook/esm2_t33_650M_UR50D",
+  "n_double_mutants": 1366,
+  "n_unique_sequences": 1500,
+  "n_cached_before": 0,
+  "n_scored_sequences": 1500,
+  "n_masked_forward_examples": 97500,
+  "batch_size": 32,
+  "model_load_seconds": 28.941402908414602,
+  "inference_seconds": 479.04145183600485,
+  "total_seconds": 508.3499891255051,
+  "sequences_per_second": 3.131253035099581,
+  "masked_examples_per_second": 203.53144728147277,
+  "device": "cuda",
+  "dtype": "float16 autocast"
+}

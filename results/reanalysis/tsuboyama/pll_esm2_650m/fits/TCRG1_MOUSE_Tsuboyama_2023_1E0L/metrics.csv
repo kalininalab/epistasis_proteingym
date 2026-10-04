@@ -1,0 +1,3 @@
+dataset,subset,n,rho_PLL_fitted_epistasis,rho_direct_epsilon_PLL
+TCRG1_MOUSE_Tsuboyama_2023_1E0L,all_doubles,437,0.04745602004366146,0.011685089967269725
+TCRG1_MOUSE_Tsuboyama_2023_1E0L,epistatic,30,0.22402669632925473,0.3281423804226919

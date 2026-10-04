@@ -1,0 +1,3 @@
+dataset,subset,n,rho_PLL_fitted_epistasis,rho_direct_epsilon_PLL
+PITX2_HUMAN_Tsuboyama_2023_2L7M,all_doubles,886,0.03907359361622366,-0.00017829044848627161
+PITX2_HUMAN_Tsuboyama_2023_2L7M,epistatic,228,0.007379943038057988,0.01947904021253912

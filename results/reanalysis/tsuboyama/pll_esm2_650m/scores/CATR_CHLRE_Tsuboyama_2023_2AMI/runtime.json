@@ -1,0 +1,17 @@
+{
+  "dataset": "CATR_CHLRE_Tsuboyama_2023_2AMI",
+  "model": "facebook/esm2_t33_650M_UR50D",
+  "n_double_mutants": 563,
+  "n_unique_sequences": 657,
+  "n_cached_before": 0,
+  "n_scored_sequences": 657,
+  "n_masked_forward_examples": 47304,
+  "batch_size": 32,
+  "model_load_seconds": 37.03815848659724,
+  "inference_seconds": 245.04577164631337,
+  "total_seconds": 282.34026705194265,
+  "sequences_per_second": 2.681131755859393,
+  "masked_examples_per_second": 193.0414864218763,
+  "device": "cuda",
+  "dtype": "float16 autocast"
+}

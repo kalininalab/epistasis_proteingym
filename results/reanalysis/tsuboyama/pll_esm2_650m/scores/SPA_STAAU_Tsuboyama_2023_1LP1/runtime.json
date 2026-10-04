@@ -1,0 +1,17 @@
+{
+  "dataset": "SPA_STAAU_Tsuboyama_2023_1LP1",
+  "model": "facebook/esm2_t33_650M_UR50D",
+  "n_double_mutants": 1070,
+  "n_unique_sequences": 1185,
+  "n_cached_before": 0,
+  "n_scored_sequences": 1185,
+  "n_masked_forward_examples": 65175,
+  "batch_size": 32,
+  "model_load_seconds": 31.374822332523763,
+  "inference_seconds": 1870.867487535812,
+  "total_seconds": 1903.0071426164359,
+  "sequences_per_second": 0.6333960090144102,
+  "masked_examples_per_second": 34.83678049579256,
+  "device": "cuda",
+  "dtype": "float16 autocast"
+}

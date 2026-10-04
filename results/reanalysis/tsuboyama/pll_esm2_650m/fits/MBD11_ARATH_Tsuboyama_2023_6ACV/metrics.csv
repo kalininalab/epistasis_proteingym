@@ -1,0 +1,3 @@
+dataset,subset,n,rho_PLL_fitted_epistasis,rho_direct_epsilon_PLL
+MBD11_ARATH_Tsuboyama_2023_6ACV,all_doubles,961,0.0252018021984203,0.03639135213016586
+MBD11_ARATH_Tsuboyama_2023_6ACV,epistatic,113,0.102618271342072,0.08155898596047644

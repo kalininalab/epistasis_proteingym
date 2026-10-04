@@ -1,0 +1,4 @@
+pair_name,n,divergences,mean_accept_prob,max_num_steps
+1ORC.pdb_hnet0,361,0,0.8720442056655884,79
+1ORC.pdb_hnet1,361,0,0.7497215270996094,167
+1ORC.pdb_hnet2,361,0,0.8935514688491821,111

@@ -1,0 +1,3 @@
+pair_name,n,divergences,mean_accept_prob,max_num_steps
+2MYX.pdb_dmutv5_28S:38T,266,0,0.8338361978530884,103
+2MYX.pdb_hnet0,359,0,0.6987016201019287,255

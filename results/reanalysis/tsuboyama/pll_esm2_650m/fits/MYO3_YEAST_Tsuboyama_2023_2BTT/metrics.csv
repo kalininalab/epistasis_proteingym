@@ -1,0 +1,3 @@
+dataset,subset,n,rho_PLL_fitted_epistasis,rho_direct_epsilon_PLL
+MYO3_YEAST_Tsuboyama_2023_2BTT,all_doubles,2350,0.022966942428734653,0.05414666308965515
+MYO3_YEAST_Tsuboyama_2023_2BTT,epistatic,577,0.05445485488516949,0.13618857931591438

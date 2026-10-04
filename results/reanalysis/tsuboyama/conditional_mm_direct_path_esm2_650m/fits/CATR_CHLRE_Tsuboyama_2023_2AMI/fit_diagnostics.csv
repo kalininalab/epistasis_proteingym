@@ -1,0 +1,4 @@
+pair_name,n,divergences,mean_accept_prob,max_num_steps
+2AMI.pdb_dmutv5_10I:70M,300,0,0.8016608357429504,31
+2AMI.pdb_dmutv5_14F:63F,160,0,0.8706195950508118,239
+2AMI.pdb_dmutv5_14F:66F,103,0,0.947235643863678,31

@@ -1,0 +1,17 @@
+{
+  "dataset": "RFAH_ECOLI_Tsuboyama_2023_2LCL",
+  "model": "facebook/esm2_t33_650M_UR50D",
+  "n_double_mutants": 357,
+  "n_unique_sequences": 396,
+  "n_cached_before": 0,
+  "n_scored_sequences": 396,
+  "n_masked_forward_examples": 21780,
+  "batch_size": 32,
+  "model_load_seconds": 26.864876077510417,
+  "inference_seconds": 582.5422346945852,
+  "total_seconds": 609.576964632608,
+  "sequences_per_second": 0.6797790381801494,
+  "masked_examples_per_second": 37.38784709990822,
+  "device": "cuda",
+  "dtype": "float16 autocast"
+}

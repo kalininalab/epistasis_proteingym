@@ -1,0 +1,17 @@
+{
+  "dataset": "NUSA_ECOLI_Tsuboyama_2023_1WCL",
+  "model": "facebook/esm2_t33_650M_UR50D",
+  "n_double_mutants": 722,
+  "n_unique_sequences": 799,
+  "n_cached_before": 0,
+  "n_scored_sequences": 799,
+  "n_masked_forward_examples": 55131,
+  "batch_size": 32,
+  "model_load_seconds": 34.41750962100923,
+  "inference_seconds": 2199.4211857132614,
+  "total_seconds": 2234.1078685475513,
+  "sequences_per_second": 0.3632773955211713,
+  "masked_examples_per_second": 25.06614029096082,
+  "device": "cuda",
+  "dtype": "float16 autocast"
+}

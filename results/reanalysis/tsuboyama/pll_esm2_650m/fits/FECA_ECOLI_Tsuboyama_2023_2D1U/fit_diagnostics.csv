@@ -1,0 +1,3 @@
+pair_name,n,divergences,mean_accept_prob,max_num_steps
+2D1U.pdb_dmutv5_34K:56S,330,0,0.8803682923316956,31
+2D1U.pdb_hnet0,337,0,0.9302036166191101,15

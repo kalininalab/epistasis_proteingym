@@ -1,0 +1,3 @@
+dataset,subset,n,rho_original,rho_conditional_direct_fitted,rho_direct_E_cond
+RAD_ANTMA_Tsuboyama_2023_2CJJ,all_doubles,138,0.02998760220692443,-0.06771174618540647,-0.3808885611282474
+RAD_ANTMA_Tsuboyama_2023_2CJJ,epistatic,38,0.13885545464492832,0.006893533209322683,-0.22967501914870336

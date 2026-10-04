@@ -1,0 +1,17 @@
+{
+  "dataset": "HECD1_HUMAN_Tsuboyama_2023_3DKM",
+  "model": "facebook/esm2_t33_650M_UR50D",
+  "n_double_mutants": 4342,
+  "n_unique_sequences": 4624,
+  "n_cached_before": 0,
+  "n_scored_sequences": 4624,
+  "n_masked_forward_examples": 332928,
+  "batch_size": 32,
+  "model_load_seconds": 33.085243413224816,
+  "inference_seconds": 13263.48053678777,
+  "total_seconds": 13297.193392870948,
+  "sequences_per_second": 0.3486264398831672,
+  "masked_examples_per_second": 25.10110367158804,
+  "device": "cuda",
+  "dtype": "float16 autocast"
+}

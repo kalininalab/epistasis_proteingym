@@ -1,0 +1,3 @@
+dataset,subset,n,rho_original,rho_conditional_direct_fitted,rho_direct_E_cond
+RFAH_ECOLI_Tsuboyama_2023_2LCL,all_doubles,357,0.0048129148636936,0.13674042839155626,0.08173207589717016
+RFAH_ECOLI_Tsuboyama_2023_2LCL,epistatic,57,0.014940610265933999,0.08724397199896293,0.1772102670469277

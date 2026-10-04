@@ -1,0 +1,3 @@
+dataset,subset,n,rho_PLL_fitted_epistasis,rho_direct_epsilon_PLL
+BCHB_CHLTE_Tsuboyama_2023_2KRU,all_doubles,682,0.04842009343815421,0.07498232281042072
+BCHB_CHLTE_Tsuboyama_2023_2KRU,epistatic,56,0.41866028708133973,0.3359535201640465

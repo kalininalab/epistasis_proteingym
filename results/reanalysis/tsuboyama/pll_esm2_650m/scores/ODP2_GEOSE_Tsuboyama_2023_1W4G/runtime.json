@@ -1,0 +1,17 @@
+{
+  "dataset": "ODP2_GEOSE_Tsuboyama_2023_1W4G",
+  "model": "facebook/esm2_t33_650M_UR50D",
+  "n_double_mutants": 465,
+  "n_unique_sequences": 563,
+  "n_cached_before": 0,
+  "n_scored_sequences": 563,
+  "n_masked_forward_examples": 24772,
+  "batch_size": 32,
+  "model_load_seconds": 33.20593276061118,
+  "inference_seconds": 559.7429097788408,
+  "total_seconds": 593.1511983145028,
+  "sequences_per_second": 1.0058189039365342,
+  "masked_examples_per_second": 44.2560317732075,
+  "device": "cuda",
+  "dtype": "float16 autocast"
+}

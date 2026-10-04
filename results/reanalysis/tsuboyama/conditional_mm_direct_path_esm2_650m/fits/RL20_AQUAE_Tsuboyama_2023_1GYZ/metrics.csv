@@ -1,0 +1,3 @@
+dataset,subset,n,rho_original,rho_conditional_direct_fitted,rho_direct_E_cond
+RL20_AQUAE_Tsuboyama_2023_1GYZ,all_doubles,340,0.06169889066720711,0.32760096598644844,0.10974307884961665
+RL20_AQUAE_Tsuboyama_2023_1GYZ,epistatic,82,-0.02929908576577538,0.5441712650058228,0.2683797520706131

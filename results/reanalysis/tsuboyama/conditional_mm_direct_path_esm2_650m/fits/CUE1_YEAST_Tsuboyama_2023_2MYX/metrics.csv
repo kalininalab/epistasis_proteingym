@@ -1,0 +1,3 @@
+dataset,subset,n,rho_original,rho_conditional_direct_fitted,rho_direct_E_cond
+CUE1_YEAST_Tsuboyama_2023_2MYX,all_doubles,625,0.08982871545901433,0.313037748832637,0.06263674352310437
+CUE1_YEAST_Tsuboyama_2023_2MYX,epistatic,143,0.14225343009144956,0.4179511802751239,0.12736793722709214

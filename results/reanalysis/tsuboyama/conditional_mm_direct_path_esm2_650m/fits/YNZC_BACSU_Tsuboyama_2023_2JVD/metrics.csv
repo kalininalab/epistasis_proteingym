@@ -1,0 +1,3 @@
+dataset,subset,n,rho_original,rho_conditional_direct_fitted,rho_direct_E_cond
+YNZC_BACSU_Tsuboyama_2023_2JVD,all_doubles,1586,0.021552854071897228,0.242141824998889,0.0301978817262489
+YNZC_BACSU_Tsuboyama_2023_2JVD,epistatic,66,-0.048158817645763616,0.5415092370316252,0.18417701701283792

@@ -1,0 +1,17 @@
+{
+  "dataset": "SPG2_STRSG_Tsuboyama_2023_5UBS",
+  "model": "facebook/esm2_t33_650M_UR50D",
+  "n_double_mutants": 422,
+  "n_unique_sequences": 495,
+  "n_cached_before": 0,
+  "n_scored_sequences": 495,
+  "n_masked_forward_examples": 27720,
+  "batch_size": 32,
+  "model_load_seconds": 37.59482857491821,
+  "inference_seconds": 825.6625294722617,
+  "total_seconds": 863.4861895982176,
+  "sequences_per_second": 0.5995185470223396,
+  "masked_examples_per_second": 33.573038633251024,
+  "device": "cuda",
+  "dtype": "float16 autocast"
+}

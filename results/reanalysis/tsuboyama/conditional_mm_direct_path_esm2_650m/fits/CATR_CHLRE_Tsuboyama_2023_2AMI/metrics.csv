@@ -1,0 +1,3 @@
+dataset,subset,n,rho_original,rho_conditional_direct_fitted,rho_direct_E_cond
+CATR_CHLRE_Tsuboyama_2023_2AMI,all_doubles,563,-0.10693424778561134,0.13530982707428127,0.11980203520878016
+CATR_CHLRE_Tsuboyama_2023_2AMI,epistatic,34,-0.04048892284186402,0.09763177998472114,0.08296409472880059

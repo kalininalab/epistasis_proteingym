@@ -1,0 +1,17 @@
+{
+  "dataset": "ISDH_STAAW_Tsuboyama_2023_2LHR",
+  "model": "facebook/esm2_t33_650M_UR50D",
+  "n_double_mutants": 1004,
+  "n_unique_sequences": 1119,
+  "n_cached_before": 0,
+  "n_scored_sequences": 1119,
+  "n_masked_forward_examples": 61545,
+  "batch_size": 32,
+  "model_load_seconds": 33.25790795125067,
+  "inference_seconds": 1657.027089284733,
+  "total_seconds": 1690.6298110559583,
+  "sequences_per_second": 0.6753057974948521,
+  "masked_examples_per_second": 37.141818862216866,
+  "device": "cuda",
+  "dtype": "float16 autocast"
+}

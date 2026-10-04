@@ -1,0 +1,17 @@
+{
+  "dataset": "RD23A_HUMAN_Tsuboyama_2023_1IFY",
+  "model": "facebook/esm2_t33_650M_UR50D",
+  "n_double_mutants": 221,
+  "n_unique_sequences": 260,
+  "n_cached_before": 0,
+  "n_scored_sequences": 260,
+  "n_masked_forward_examples": 11440,
+  "batch_size": 32,
+  "model_load_seconds": 37.981164866127074,
+  "inference_seconds": 264.7469061072916,
+  "total_seconds": 302.9093966819346,
+  "sequences_per_second": 0.9820700223580031,
+  "masked_examples_per_second": 43.21108098375214,
+  "device": "cuda",
+  "dtype": "float16 autocast"
+}

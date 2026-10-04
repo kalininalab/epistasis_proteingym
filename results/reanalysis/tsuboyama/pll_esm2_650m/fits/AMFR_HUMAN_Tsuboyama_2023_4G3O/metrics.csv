@@ -1,0 +1,3 @@
+dataset,subset,n,rho_PLL_fitted_epistasis,rho_direct_epsilon_PLL
+AMFR_HUMAN_Tsuboyama_2023_4G3O,all_doubles,2152,-0.03606787149433751,-0.08849538511547332
+AMFR_HUMAN_Tsuboyama_2023_4G3O,epistatic,478,-0.23258474848398397,-0.20027398465890273

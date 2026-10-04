@@ -1,0 +1,4 @@
+pair_name,n,divergences,mean_accept_prob,max_num_steps
+2LO1.pdb_dmutv5_22Y:48Y,331,0,0.7074199914932251,103
+2LO1.pdb_hnet0,361,0,0.8894819617271423,247
+2LO1.pdb_hnet1,356,0,0.8722070455551147,23

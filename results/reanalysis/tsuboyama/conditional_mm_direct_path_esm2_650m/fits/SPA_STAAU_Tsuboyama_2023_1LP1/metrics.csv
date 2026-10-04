@@ -1,0 +1,3 @@
+dataset,subset,n,rho_original,rho_conditional_direct_fitted,rho_direct_E_cond
+SPA_STAAU_Tsuboyama_2023_1LP1,all_doubles,1070,0.001706249497364131,0.15401333242528278,0.04330052384330693
+SPA_STAAU_Tsuboyama_2023_1LP1,epistatic,95,-0.16250927366196893,0.13724804031354984,0.18671612541993285
