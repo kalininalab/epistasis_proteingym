@@ -82,10 +82,21 @@ def model_figure(model, d, meta_row):
     fig.tight_layout(); return fig
 
 def heatmap(d, ordered_meta, subset, stem):
-    models=ordered_meta.model.tolist(); datasets=sorted(d.dataset.unique())
+    # Use a reviewer-friendly biological ordering rather than the bar-plot
+    # ordering: interaction-aware joint models first, then sitewise models,
+    # with the explicit-pairwise baseline retained as its own final section.
+    heat_order={"joint":0,"sitewise":1,"explicit_pairwise":2,"user_model":3}
+    heat_meta=ordered_meta.assign(_heat=ordered_meta.scoring_type.map(heat_order)).sort_values(["_heat","model_family","model"])
+    models=heat_meta.model.tolist(); datasets=sorted(d.dataset.unique())
     p=d[d.subset.eq(subset)].pivot(index="model",columns="dataset",values="rho").reindex(index=models,columns=datasets)
     fig,ax=plt.subplots(figsize=(22,12)); im=ax.imshow(p,aspect="auto",cmap="RdBu_r",vmin=-1,vmax=1)
     ax.set_yticks(np.arange(len(models)),models,fontsize=8); ax.set_xticks(np.arange(len(datasets)),[short_dataset(v).replace("\n"," ") for v in datasets],rotation=65,ha="right",fontsize=7)
+    types=heat_meta.scoring_type.tolist()
+    boundaries=[i for i in range(1,len(types)) if types[i] != types[i-1]]
+    for boundary in boundaries:
+        ax.axhline(boundary-.5,color="#172033",lw=1.4)
+    for tick,kind in zip(ax.get_yticklabels(),types):
+        if kind == "joint": tick.set_fontweight("bold")
     ax.set_title(f"Best ProteinGym models: fitted epistasis Spearman ρ ({subset.replace('_',' ')})",loc="left",weight="bold")
     cb=fig.colorbar(im,ax=ax,pad=.01); cb.set_label("Spearman ρ"); fig.tight_layout()
     fig.savefig(OUT/f"{stem}.png",dpi=220,bbox_inches="tight"); fig.savefig(OUT/f"{stem}.pdf",bbox_inches="tight"); plt.close(fig)
@@ -94,7 +105,12 @@ def main():
     ap=argparse.ArgumentParser(); ap.add_argument("--mode",choices=["prepare","dataset","model","finish"],default="prepare"); ap.add_argument("--start",type=int,default=0); ap.add_argument("--end",type=int)
     args=ap.parse_args()
     OUT.mkdir(parents=True,exist_ok=True); (OUT/"by_dataset").mkdir(exist_ok=True); (OUT/"by_model").mkdir(exist_ok=True)
-    d, excluded, meta = collect(); d.to_csv(OUT/"per_assay_model_correlations.csv",index=False); excluded.to_csv(OUT/"excluded_best_models.csv",index=False)
+    if args.mode == "finish" and (OUT/"per_assay_model_correlations.csv").exists():
+        d=pd.read_csv(OUT/"per_assay_model_correlations.csv")
+        excluded=pd.read_csv(OUT/"excluded_best_models.csv")
+        meta=d[["model","model_family","scoring_type"]].drop_duplicates()
+    else:
+        d, excluded, meta = collect(); d.to_csv(OUT/"per_assay_model_correlations.csv",index=False); excluded.to_csv(OUT/"excluded_best_models.csv",index=False)
     ordered_meta=meta.assign(_type=meta.scoring_type.map(TYPE_ORDER)).sort_values(["_type","model_family","model"]).drop(columns="_type")
     if args.mode=="dataset":
         items=sorted(d.dataset.unique())[args.start:args.end]
