@@ -1,0 +1,3 @@
+model,model_family,scoring_type,reason
+Linear_regression,user_model,user_model,existing fitted metrics for 0/50 assays
+MLP,user_model,user_model,existing fitted metrics for 0/50 assays
