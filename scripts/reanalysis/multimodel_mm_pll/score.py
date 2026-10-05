@@ -69,7 +69,7 @@ def load_model(checkpoint,revision):
         # mismatch so a wrong/incomplete checkpoint cannot load silently.
         incompatible=model.load_state_dict(state,strict=False)
         allowed_missing=['esm.contact_head.regression.weight','esm.contact_head.regression.bias']
-        if incompatible.missing_keys != allowed_missing or incompatible.unexpected_keys != ['esm.embeddings.position_ids']:
+        if incompatible.missing_keys not in ([],allowed_missing) or incompatible.unexpected_keys != ['esm.embeddings.position_ids']:
             raise RuntimeError(f'unexpected legacy checkpoint mismatch: {incompatible}')
         return model
 
