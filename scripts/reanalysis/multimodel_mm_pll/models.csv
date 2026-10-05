@@ -1,0 +1,12 @@
+model_key,checkpoint,revision,default_column,role,status,notes
+ESM1b,facebook/esm1b_t33_650M_UR50S,7b37824baec4d3658e1df7479222a7c79b465b76,ESM1b,representative,running_full,standard masked LM; pilot passed 2026-10-05
+ESM1v_1,facebook/esm1v_t33_650M_UR90S_1,8bfdb1892536cc77bd0760b9c25ddced2cd0b4c8,ESM1v_ensemble,ensemble_component,running_full,component 1 of 5; pilot passed 2026-10-05
+ESM1v_2,facebook/esm1v_t33_650M_UR90S_2,3c1e9e64480f069b163e456c361bfd80a8bab04c,ESM1v_ensemble,ensemble_component,running_full,component 2 of 5; pilot passed 2026-10-05
+ESM1v_3,facebook/esm1v_t33_650M_UR90S_3,0b00fd112e63f6b5e70a9cd8484d4e660312ce70,ESM1v_ensemble,ensemble_component,running_full,component 3 of 5; pilot passed 2026-10-05
+ESM1v_4,facebook/esm1v_t33_650M_UR90S_4,443968f644da132d323bbc6321a6d443149fa57b,ESM1v_ensemble,ensemble_component,running_full,component 4 of 5; pilot passed 2026-10-05
+ESM1v_5,facebook/esm1v_t33_650M_UR90S_5,fb2e51cb0f605cbad2c4ca3bb784be7bc8e2f4a8,ESM1v_ensemble,ensemble_component,running_full,component 5 of 5; pilot passed 2026-10-05
+ESM2_150M,facebook/esm2_t30_150M_UR50D,a695f6045e2e32885fa60af20c13cb35398ce30c,ESM2_150M,representative,running_full,standard masked LM; pilot passed 2026-10-05
+ESM2_650M,facebook/esm2_t33_650M_UR50D,08e4846e537177426273712802403f7ba8261b6c,ESM2_650M,completed_existing,complete,existing conditional-MM and PLL analysis
+ESMC-300M,evolutionary-scale/esmc-300m-2024-12,,,representative,pending_adapter,different ESM API; next candidate
+ESM3,,,,representative,pending_definition,generative multimodal API; no drop-in masked-MM adapter
+ESM-IF1,,,,representative,not_masked_lm,inverse-folding conditional model; standard masked MM/PLL not applicable
