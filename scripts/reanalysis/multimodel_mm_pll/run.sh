@@ -6,9 +6,9 @@ export HF_HOME=/data/users/akolchina/.cache/huggingface
 export HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1
 case "$1" in
   score)
-    key="$2"; checkpoint="$3"; revision="$4"; default="$5"; dataset="$6"; max_doubles="${7:-}"; namespace="${8:-full}"
+    key="$2"; checkpoint="$3"; revision="$4"; default="$5"; dataset="$6"; max_doubles="${7:-none}"; namespace="${8:-full}"
     [[ "$namespace" == "full" ]] || base="$base/$namespace"
-    extra=(); [[ -n "$max_doubles" ]] && extra=(--max-doubles "$max_doubles")
+    extra=(); [[ "$max_doubles" == "none" ]] || extra=(--max-doubles "$max_doubles")
     exec /nethome/akolchina/miniconda3/envs/ofs/bin/python -u "$root/scripts/reanalysis/multimodel_mm_pll/score.py" --model-key "$key" --checkpoint "$checkpoint" --revision "$revision" --default-column "$default" --dataset "$dataset" --output "$base/scores/$key/$dataset" --batch-size 16 "${extra[@]}"
     ;;
   aggregate)
