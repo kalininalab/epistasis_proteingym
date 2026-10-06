@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 ROOT = Path('/data/users/akolchina/epistasis_proteingym')
 BASE = ROOT / 'results/reanalysis/tsuboyama/multimodel_mm_pll/summary'
 OUT = BASE / 'three_score_barplots'
-MODELS = ['ESM1b', 'ESM1v_ensemble', 'ESM2_150M']
+MODELS = ['ESM1b', 'ESM1v_ensemble', 'ESM2_150M', 'ESM2_650M']
 METHODS = [('default_mm','Default MM','#4267AC'),
            ('conditional_mm','Conditional MM','#BE577C'),
            ('pll','PLL','#D67F32')]
