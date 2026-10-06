@@ -60,3 +60,10 @@ complete `S_cond_direct`, `PLL_WT`, `PLL_A`, `PLL_B`, `PLL_AB`, and
 `epsilon_PLL`. The fit stage saves conditional-MM and PLL additive
 reconstructions, residual epistasis, diagnostics, and correlations for all
 doubles and the predefined epistatic subset.
+
+## Final comparisons
+
+`results/reanalysis/tsuboyama/multimodel_mm_pll/summary/` contains the unified
+assay-level tables. `three_score_barplots/<model>/` contains matching grouped
+barplots for raw double-mutant fitness and fitted epistatic residuals: three
+bars per assay for default MM, conditional MM, and PLL.
