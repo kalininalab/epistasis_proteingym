@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-"""Prepare pilot or full HTCondor DAG, capped at ten concurrent GPUs."""
+"""Prepare pilot or full HTCondor DAG, capped at 50 concurrent GPUs."""
 import argparse
 from pathlib import Path
 import pandas as pd
@@ -22,6 +22,6 @@ def main():
         # Average five ESM1v checkpoints, then fit the ensemble only.
         agg=f'A_ESM1v_{di:02d}'; fit=f'F_ESM1v_{di:02d}'; parents=' '.join(scores[(dataset,f'ESM1v_{i}')] for i in range(1,6))
         dag += [f'JOB {agg} {condor}/cpu.sub',f'VARS {agg} arguments="aggregate {dataset} {tag}"',f'CATEGORY {agg} cpu',f'PARENT {parents} CHILD {agg}',f'JOB {fit} {condor}/cpu.sub',f'VARS {fit} arguments="fit ESM1v_ensemble {dataset} {tag}"',f'CATEGORY {fit} cpu',f'PARENT {agg} CHILD {fit}']
-    dag += ['MAXJOBS gpu 10','MAXJOBS cpu 10']; (condor/'analysis.dag').write_text('\n'.join(dag)+'\n')
-    print(f'{tag}: {len(models)*len(datasets)} GPU score jobs, {4*len(datasets)} dependent CPU nodes; max 10 GPUs'); print(condor/'analysis.dag')
+    dag += ['MAXJOBS gpu 50','MAXJOBS cpu 10']; (condor/'analysis.dag').write_text('\n'.join(dag)+'\n')
+    print(f'{tag}: {len(models)*len(datasets)} GPU score jobs, {4*len(datasets)} dependent CPU nodes; max 50 GPUs'); print(condor/'analysis.dag')
 if __name__=='__main__': main()

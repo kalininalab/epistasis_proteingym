@@ -9,7 +9,7 @@ masked ESM models in `tsuboyama_best_models.csv`:
 
 ESM2-650M is already complete and is not recomputed. `models.csv` tracks the
 implemented models and the next ESM-family adapters. The production DAG has
-350 GPU scoring jobs and at most **10 run concurrently**. Each scoring job
+350 GPU scoring jobs and at most **50 run concurrently**. Each scoring job
 computes conditional MM and cached PLL together; dependent CPU jobs aggregate
 ESM1v and fit the established additive model.
 
