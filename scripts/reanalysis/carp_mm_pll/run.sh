@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+set -euo pipefail
+root=/data/users/akolchina/epistasis_proteingym;base="$root/results/reanalysis/tsuboyama/carp_mm_pll";export PYTHONPATH=/data/users/akolchina/software/protein-sequence-models:${PYTHONPATH:-};mode="$1";ds="$2";ns="$3";[[ "$ns" == full ]]||base="$base/$ns"
+if [[ "$mode" == score ]];then limit="$4";extra=();[[ "$limit" == none ]]||extra=(--max-doubles "$limit");exec /nethome/akolchina/miniconda3/envs/ofs/bin/python -u "$root/scripts/reanalysis/carp_mm_pll/score.py" --dataset "$ds" --output "$base/scores/CARP_76M/$ds" --weights /data/users/akolchina/model_weights/carp/carp_76M.pt --batch-size 16 "${extra[@]}";else export JAX_PLATFORM_NAME=cpu XLA_FLAGS='--xla_cpu_multi_thread_eigen=false intra_op_parallelism_threads=1';exec /nethome/akolchina/miniconda3/envs/protease-pipeline/bin/python -u "$root/scripts/reanalysis/multimodel_mm_pll/fit.py" --scores "$base/scores/CARP_76M/$ds/scores.csv" --output "$base/fits/CARP_76M/$ds";fi
