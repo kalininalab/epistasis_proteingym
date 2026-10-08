@@ -6,7 +6,8 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 import torch
-from transformers import T5ForConditionalGeneration, T5Tokenizer
+from transformers import AutoConfig, T5ForConditionalGeneration, T5Tokenizer
+from transformers.utils.hub import cached_file
 
 ROOT=Path('/data/users/akolchina/epistasis_proteingym')
 INPUT=ROOT/'results/tables/intermediate/tsuboyama_epistatic'
@@ -40,7 +41,16 @@ def mutate(wt,mutation):
     seq=list(wt); seq[pos]=new; return ''.join(seq)
 
 def load_model(checkpoint,revision):
-    return T5ForConditionalGeneration.from_pretrained(checkpoint,revision=revision,local_files_only=True,torch_dtype=torch.float16)
+    try:
+        return T5ForConditionalGeneration.from_pretrained(checkpoint,revision=revision,local_files_only=True,torch_dtype=torch.float16)
+    except ValueError as exc:
+        if checkpoint != 'Rostlab/prot_t5_xl_uniref50' or 'upgrade torch to at least v2.6' not in str(exc): raise
+        config=AutoConfig.from_pretrained(checkpoint,revision=revision,local_files_only=True)
+        model=T5ForConditionalGeneration(config).half()
+        path=cached_file(checkpoint,'pytorch_model.bin',revision=revision,local_files_only=True)
+        state=torch.load(path,map_location='cpu',weights_only=True)
+        model.load_state_dict(state,strict=True)
+        return model
 
 def masked_batch(batch,tokenizer,device):
     texts=[]
