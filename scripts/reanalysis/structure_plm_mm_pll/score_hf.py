@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 """Conditional masked-marginals and full PLL for ProSST-1024 and SaProt-35M-AF2."""
 from __future__ import annotations
-import argparse,csv,json,sys,time,subprocess,tempfile
+import argparse,csv,json,sys,time,subprocess,tempfile,os
 from pathlib import Path
 import numpy as np,pandas as pd,torch
 from transformers import AutoModelForMaskedLM,AutoTokenizer
@@ -15,12 +15,36 @@ def saprot_3di(ds,wt):
  cache=ASSET/'saprot_3di';cache.mkdir(exist_ok=True);out=cache/f'{ds}.txt'
  if out.exists():return out.read_text().strip()
  fold='/data/users/akolchina/software/foldseek/foldseek/bin/foldseek';util='/data/users/akolchina/software/ProteinGym/proteingym/baselines/saprot/foldseek_util.py';sys.path.insert(0,str(Path(util).parent));from foldseek_util import get_struc_seq
- s=get_struc_seq(fold,str(pdb_for(ds)),['A'],plddt_mask=True,plddt_threshold=70)['A'][1].lower();assert len(s)==len(wt),(len(s),len(wt));out.write_text(s+'\n');return s
+ # ProteinGym's helper uses a fixed relative temporary filename.  Run it in a
+ # private directory because Condor workers share the same initial directory.
+ old=os.getcwd()
+ with tempfile.TemporaryDirectory(prefix='saprot_foldseek_') as tmp:
+  try:
+   os.chdir(tmp)
+   seqs=get_struc_seq(fold,str(pdb_for(ds)),['A'],plddt_mask=True,plddt_threshold=70)
+  finally:os.chdir(old)
+ s=seqs['A'][1].lower();assert len(s)==len(wt),(len(s),len(wt))
+ try:out.write_text(s+'\n')
+ except OSError:pass
+ return s
+
+def prosst_tokens(ds,wt):
+ root=ASSET/'prosst/structure_sequence/1024';p=root/f'{ds}.fasta'
+ if not p.exists():
+  # Some ProteinGym releases renamed the protein prefix while retaining the
+  # same Tsuboyama structure (for example PSAE_PICP2 -> PSAE_SYNP2, PDB 1PSE).
+  suffix='_Tsuboyama_'+ds.split('_Tsuboyama_',1)[1]
+  candidates=list(root.glob(f'*{suffix}.fasta'))
+  if len(candidates)!=1:raise FileNotFoundError(f'No unique ProSST token file for {ds}: {candidates}')
+  p=candidates[0]
+ v=[int(x) for x in read_fasta(p).split(',')]
+ if len(v)!=len(wt):raise ValueError(f'ProSST token/WT length mismatch for {ds}: {len(v)} != {len(wt)} ({p})')
+ return v
 class Backend:
  def __init__(self,key,ds,wt):
   repo,_=CFG[key];self.key=key;self.model=AutoModelForMaskedLM.from_pretrained(repo,trust_remote_code=True).cuda().eval();self.tok=AutoTokenizer.from_pretrained(repo,trust_remote_code=True);self.wt=wt
   if key.startswith('ProSST'):
-   p=ASSET/'prosst/structure_sequence/1024'/f'{ds}.fasta';v=[int(x) for x in read_fasta(p).split(',')];assert len(v)==len(wt);self.ss=torch.tensor([[1]+[x+3 for x in v]+[2]],device='cuda')
+   v=prosst_tokens(ds,wt);self.ss=torch.tensor([[1]+[x+3 for x in v]+[2]],device='cuda')
   else:self.di=saprot_3di(ds,wt);self.vocab=self.tok.get_vocab();self.aa_ids={a:[self.vocab[a+s] for s in SV] for a in AA}
  def batch(self,req):
   seqs=[s for s,p in req];pos=[p for s,p in req]
