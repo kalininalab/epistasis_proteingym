@@ -51,33 +51,42 @@ def model_order(meta):
 def matrix(d,models,datasets,value,model_col="model"):
  return d.pivot(index=model_col,columns="dataset",values=value).reindex(index=models,columns=datasets)
 
-def draw(subset,original,new,meta):
+def draw(subset, method, original, new, meta):
  models=meta.model.tolist();datasets=sorted(original.dataset.unique())
- mats=[
-  matrix(original[original.subset.eq(subset)],models,datasets,"rho"),
-  matrix(new[new.subset.eq(subset)],models,datasets,"rho_conditional_fitted_epistasis","model_key"),
-  matrix(new[new.subset.eq(subset)],models,datasets,"rho_PLL_fitted_epistasis","model_key"),
- ]
- titles=["Original ProteinGym scoring","Conditional masked-marginal","Pseudo-log-likelihood (PLL)"]
+ original_matrix=matrix(original[original.subset.eq(subset)],models,datasets,"rho")
+ value={"conditional_mm":"rho_conditional_fitted_epistasis","pll":"rho_PLL_fitted_epistasis"}.get(method)
+ p=original_matrix.copy()
+ if value:
+  method_matrix=matrix(new[new.subset.eq(subset)],models,datasets,value,"model_key")
+  sitewise=meta.loc[meta.scoring_type.eq("sitewise"),"model"]
+  p.loc[sitewise]=method_matrix.loc[sitewise]
+ titles={
+  "original":"Original ProteinGym scoring",
+  "conditional_mm":"Conditional masked-marginal scoring for sitewise models",
+  "pll":"Pseudo-log-likelihood (PLL) scoring for sitewise models",
+ }
  recomputed=set(new.groupby("model_key").dataset.nunique().loc[lambda x:x==50].index)
- fig,axes=plt.subplots(3,1,figsize=(24,27),sharex=True)
+ fig,ax=plt.subplots(figsize=(24,12.5))
  cmap=plt.get_cmap("RdBu_r").copy();cmap.set_bad("#E5E7EB")
  types=meta.scoring_type.tolist();bounds=[i for i in range(1,len(types)) if types[i]!=types[i-1]]
- for ax,p,title in zip(axes,mats,titles):
-  im=ax.imshow(np.ma.masked_invalid(p.to_numpy(float)),aspect="auto",cmap=cmap,vmin=-1,vmax=1)
-  ax.set_yticks(np.arange(len(models)),models,fontsize=8.5)
-  for tick,name in zip(ax.get_yticklabels(),models):
-   if name in recomputed: tick.set_fontweight("bold")
-  for b in bounds: ax.axhline(b-.5,color="#172033",lw=1.5)
-  ax.set_title(title,loc="left",weight="bold",fontsize=14,pad=8)
-  ax.set_ylabel("Best-model representative")
- axes[-1].set_xticks(np.arange(len(datasets)),[short_ds(x) for x in datasets],rotation=65,ha="right",fontsize=7)
- cb=fig.colorbar(im,ax=axes,pad=.008,shrink=.75);cb.set_label("Spearman ρ: predicted vs experimental thermodynamic coupling")
+ im=ax.imshow(np.ma.masked_invalid(p.to_numpy(float)),aspect="auto",cmap=cmap,vmin=-1,vmax=1)
+ ax.set_yticks(np.arange(len(models)),models,fontsize=8.5)
+ for tick,name in zip(ax.get_yticklabels(),models):
+  if name in recomputed: tick.set_fontweight("bold")
+ for b in bounds: ax.axhline(b-.5,color="#172033",lw=2)
+ ax.set_xticks(np.arange(len(datasets)),[short_ds(x) for x in datasets],rotation=65,ha="right",fontsize=7)
+ ax.set_ylabel("Best-model representative")
+ cb=fig.colorbar(im,ax=ax,pad=.008,shrink=.78);cb.set_label("Spearman ρ: predicted vs experimental thermodynamic coupling")
  label="all double mutants" if subset=="all_doubles" else "predefined epistatic subset"
- fig.suptitle(f"Tsuboyama epistasis prediction — {label}",fontsize=19,weight="bold",y=.998)
- fig.text(.5,.004,"Bold model names: at least one new scoring method recomputed for all 50 assays. Gray cells: that method is unavailable or still running.",ha="center",fontsize=10,color="#475569")
- fig.tight_layout(rect=(0,.012,1,.99));OUT.mkdir(parents=True,exist_ok=True)
- for ext in ("png","pdf"): fig.savefig(OUT/f"three_score_epistasis_heatmap_{subset}.{ext}",dpi=220 if ext=="png" else None,bbox_inches="tight")
+ fig.suptitle(f"{titles[method]} — {label}",fontsize=19,weight="bold",y=.995)
+ if method=="original":
+  note="All rows show original ProteinGym scores. Bold model names identify models with newly recomputed scores in the companion figures."
+ else:
+  note=("Joint models (top) and the explicit-pairwise model retain original ProteinGym scores; "
+        f"sitewise models use {titles[method].split(' scoring')[0]}. Bold = newly recomputed; gray = unavailable or in progress.")
+ fig.text(.5,.006,note,ha="center",fontsize=10,color="#475569")
+ fig.tight_layout(rect=(0,.025,1,.965));OUT.mkdir(parents=True,exist_ok=True)
+ for ext in ("png","pdf"): fig.savefig(OUT/f"{method}_epistasis_heatmap_{subset}.{ext}",dpi=220 if ext=="png" else None,bbox_inches="tight")
  plt.close(fig)
  return recomputed
 
@@ -86,11 +95,38 @@ def main():
  meta=summary[["model","model_family","scoring_type"]].drop_duplicates();meta=model_order(meta)
  new=new_metrics();new=new[new.model_key.isin(meta.model)]
  recomputed=set()
- for subset in ("all_doubles","epistatic"): recomputed|=draw(subset,original,new,meta)
+ for subset in ("all_doubles","epistatic"):
+  for method in ("original","conditional_mm","pll"):
+   recomputed|=draw(subset,method,original,new,meta)
  coverage=(new.groupby("model_key").agg(assays=("dataset","nunique"),conditional_assays=("rho_conditional_fitted_epistasis","count"),pll_assays=("rho_PLL_fitted_epistasis","count")).reset_index().sort_values("model_key"))
  # Counts above include both subsets, so a complete method has 100 rows.
  coverage["complete_conditional_50"]=coverage.conditional_assays.ge(99);coverage["complete_pll_50"]=coverage.pll_assays.ge(99);coverage.to_csv(OUT/"recomputed_model_coverage.csv",index=False)
  new.to_csv(OUT/"recomputed_per_assay_metrics.csv",index=False)
- (OUT/"README.md").write_text("# Updated best-model heatmaps\n\nThree aligned panels compare original ProteinGym-derived, conditional-MM, and PLL fitted epistasis Spearman correlations. Rows are the 39 best-family representatives; columns are the 50 Tsuboyama assays. Bold rows have complete recomputation for all 50 assays. Gray cells are unavailable or in progress.\n")
+ (OUT/"README.md").write_text("""# Updated best-model epistasis heatmaps
+
+Six separate heatmaps compare three scoring procedures on all double mutants and on the predefined epistatic subset:
+
+- `original_epistasis_heatmap_*.png`: original ProteinGym scores for every model.
+- `conditional_mm_epistasis_heatmap_*.png`: conditional masked-marginal scores for sitewise models.
+- `pll_epistasis_heatmap_*.png`: pseudo-log-likelihood scores for sitewise models.
+
+In the conditional-MM and PLL figures, joint models are shown first and retain their original ProteinGym scores. The explicit-pairwise model also retains its original score. Horizontal lines separate joint, sitewise, and explicit-pairwise models. Bold model names mark models for which new scores were recomputed; gray cells indicate unavailable or incomplete results.
+
+Each cell is Spearman correlation between predicted and experimental thermodynamic-coupling residuals for one Tsuboyama assay. PDF versions are provided beside every PNG. Supporting values are in `recomputed_per_assay_metrics.csv`, `model_method_summary.csv`, and `recomputed_model_coverage.csv`.
+
+## Main observations
+
+- Conditional MM is consistently more informative for fitted epistasis than PLL across the completed models.
+- ESM3 has the strongest mean conditional-MM correlation: 0.217 across all doubles and 0.334 on the predefined epistatic subset.
+- ESMC-300M ranks second: 0.175 and 0.295, respectively.
+- The best mean PLL result is much smaller: ESM3 reaches 0.035 across all doubles and 0.040 on the epistatic subset.
+
+Reproduce with:
+
+```bash
+/nethome/akolchina/miniconda3/envs/protease-pipeline/bin/python \
+  scripts/reanalysis/best_models_epistasis/plot_updated_three_scores.py
+```
+""")
  print("complete:",", ".join(sorted(recomputed)));print(coverage.to_string(index=False));print(OUT)
 if __name__=="__main__":main()
