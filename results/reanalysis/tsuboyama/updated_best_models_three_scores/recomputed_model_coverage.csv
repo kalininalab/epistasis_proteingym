@@ -1,0 +1,16 @@
+model_key,assays,conditional_assays,pll_assays,complete_conditional_50,complete_pll_50
+CARP_76M,50,99,99,True,True
+ESM1b,50,99,99,True,True
+ESM1v_ensemble,50,99,99,True,True
+ESM2_150M,50,99,99,True,True
+ESM3,50,99,99,True,True
+ESMC-300M,50,99,99,True,True
+MIF,50,99,99,True,True
+MIFST,50,99,99,True,True
+MULAN_small,50,99,99,True,True
+ProSST-1024,50,99,99,True,True
+SaProt_35M_AF2,50,99,99,True,True
+VESPA,50,99,0,True,False
+VESPAl,50,99,0,True,False
+VespaG,50,99,0,True,False
+xTrimoPGLM-10B-MLM,50,99,99,True,True
