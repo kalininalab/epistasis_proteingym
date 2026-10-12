@@ -1,0 +1,97 @@
+{
+  "input": "data/somermeyer/D7PM05_CLYGR_Somermeyer_2022.csv",
+  "n_variants": 24515,
+  "n_mutations": 1651,
+  "threshold_source": "two_component_Gaussian_mixture_intersection",
+  "threshold_log10": 3.610260212748421,
+  "threshold_raw": 4076.244377226654,
+  "active_n": 12999,
+  "inactive_n": 11516,
+  "mixture": {
+    "component_means_log10": [
+      2.849981328516797,
+      4.354335408092407
+    ],
+    "component_weights": [
+      0.4696623901667653,
+      0.5303376098332347
+    ],
+    "component_variances": [
+      0.029607168445955158,
+      0.027924897014890593
+    ],
+    "threshold_log10": 3.610260212748421,
+    "threshold_raw": 4076.244377226654
+  },
+  "supplied_active_fraction": 0.4876198245971854,
+  "agreement_with_supplied_bin": 0.9573730369161738,
+  "supplied_max_inactive": 12495.590484718374,
+  "supplied_min_active": 12503.46632643696,
+  "pairwise_min_frequency": 10,
+  "pairwise_mutations": 1123,
+  "pairwise_tests": 630003,
+  "strong_pair_definition": "abs(phi)>=0.5 and Fisher q<0.05",
+  "strong_pairs": 3,
+  "regression_min_frequency": 5,
+  "regression_mutations": 1288,
+  "performance": {
+    "classification_oof_roc_auc": 0.961554818481909,
+    "regression_oof_r2": 0.6005194071060664,
+    "regression_oof_spearman": 0.8483944238767309,
+    "outer_folds": 5,
+    "inner_folds": 3,
+    "final_classification_params": {
+      "model__alpha": 0.001,
+      "model__l1_ratio": 0.1
+    },
+    "final_regression_params": {
+      "model__alpha": 0.03,
+      "model__l1_ratio": 0.1
+    },
+    "outer_classification_params": [
+      {
+        "model__alpha": 0.001,
+        "model__l1_ratio": 0.5
+      },
+      {
+        "model__alpha": 0.001,
+        "model__l1_ratio": 0.5
+      },
+      {
+        "model__alpha": 0.001,
+        "model__l1_ratio": 0.1
+      },
+      {
+        "model__alpha": 0.001,
+        "model__l1_ratio": 0.1
+      },
+      {
+        "model__alpha": 0.001,
+        "model__l1_ratio": 0.1
+      }
+    ],
+    "outer_regression_params": [
+      {
+        "model__alpha": 0.003,
+        "model__l1_ratio": 0.9
+      },
+      {
+        "model__alpha": 0.03,
+        "model__l1_ratio": 0.1
+      },
+      {
+        "model__alpha": 0.03,
+        "model__l1_ratio": 0.1
+      },
+      {
+        "model__alpha": 0.003,
+        "model__l1_ratio": 0.9
+      },
+      {
+        "model__alpha": 0.03,
+        "model__l1_ratio": 0.1
+      }
+    ]
+  },
+  "runtime_seconds": 71.88808846473694
+}
