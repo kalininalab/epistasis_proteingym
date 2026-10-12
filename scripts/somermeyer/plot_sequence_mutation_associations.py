@@ -131,6 +131,116 @@ The strongest signals are predominantly **loss-of-fluorescence substitutions**. 
 4. For mutation pairs observed often enough for stable analysis, calculated phi correlation, Fisher exact p-values, and global FDR q-values.
 5. Evaluated Elastic Net logistic and linear models with nested **5-fold outer / 3-fold inner cross-validation**. All reported performance is based on out-of-fold predictions.
 
+## Formulas and computation
+
+### 1. Mutation indicator matrix
+
+For every variant \(v\) and specific substitution \(m\), we constructed:
+
+```text
+X[v,m] = 1  if mutation m is present in variant v
+X[v,m] = 0  otherwise
+```
+
+Thus, `A42V` is a different feature from `A42T`. The matrix contains one row per variant and one column per observed substitution. Mutation labels and sequence positions were checked against the reconstructed 235-aa wild-type cgreGFP sequence using **1-based indexing**.
+
+The continuous response was:
+
+```text
+y[v] = log10(raw fluorescence[v])
+```
+
+Spearman correlation is unchanged if raw fluorescence is used because log10 is strictly monotonic and therefore preserves ranks.
+
+### 2. Active/inactive threshold
+
+We fitted two Gaussian components to log10 fluorescence. One component represents the low-fluorescence mode and the other the high-fluorescence mode. The automatic threshold is the value \(t\) where their posterior probabilities are equal:
+
+```text
+P(low component | y=t) = P(high component | y=t)
+active[v] = 1 if y[v] >= t, otherwise 0
+```
+
+For this assay, \(t={summary['threshold_log10']:.3f}\), corresponding to {summary['threshold_raw']:,.0f} raw fluorescence units. This threshold follows the observed bimodal distribution rather than copying the supplied ProteinGym binary label.
+
+### 3. Mutation association with binary activity
+
+For each mutation, variants were arranged in a 2×2 contingency table:
+
+| | Active | Inactive |
+|---|---:|---:|
+| Mutation present | \(a\) | \(c\) |
+| Mutation absent | \(b\) | \(d\) |
+
+The odds ratio was:
+
+```text
+OR = (a × d) / (b × c)
+```
+
+An odds ratio above 1 means the mutation is enriched among active variants; below 1 means it is enriched among inactive variants. Fisher's exact test supplied an exact p-value for the same table. Infinite or zero odds ratios can occur when one cell is zero.
+
+### 4. Mutation association with continuous fluorescence
+
+The point-biserial correlation compares mean log10 fluorescence with and without a mutation:
+
+```text
+r_pb = (mean(y | X=1) - mean(y | X=0)) / sd(y)
+       × sqrt(n1 × n0 / n²)
+```
+
+This is Pearson correlation between a binary mutation indicator and continuous log10 fluorescence.
+
+Spearman correlation was computed independently for every mutation:
+
+```text
+rho_m = Pearson correlation(X[:,m], rank(y))
+```
+
+Equivalently, it asks whether variants containing mutation \(m\) tend to occupy higher or lower fluorescence ranks than variants without it. Positive rho means higher fluorescence ranks and negative rho means lower ranks. This is an **unadjusted association across combinatorial variants**: other mutations remain present and can confound the result.
+
+Point-biserial and Spearman p-values were calculated from their correlation test statistics. Fisher, point-biserial, and Spearman p-values were each corrected as separate test families using Benjamini–Hochberg false-discovery-rate control:
+
+```text
+ordered q(i) = min over j>=i of [p(j) × M / j]
+```
+
+where \(M\) is the number of mutations tested. A q-value estimates significance after accounting for the large number of simultaneous mutation tests.
+
+### 5. Mutation–mutation association
+
+For two mutations A and B, the phi coefficient is Pearson correlation between their two binary indicator columns. Using counts \(n11\) (both present), \(n10\) (only A), \(n01\) (only B), and \(n00\) (neither):
+
+```text
+phi = (n11 × n00 - n10 × n01)
+      / sqrt[(n11+n10)(n01+n00)(n11+n01)(n10+n00)]
+```
+
+Phi ranges from −1 to +1. Positive values indicate co-occurrence, values near zero indicate little association, and negative values indicate mutual avoidance. Pairwise Fisher exact tests and Benjamini–Hochberg q-values were also computed. Only mutations observed in at least {summary['pairwise_min_frequency']} variants entered this analysis.
+
+Phi measures **co-occurrence, not fluorescence and not epistasis**. Strong phi can result from library construction, shared ancestry, or mutations introduced as a block.
+
+### 6. Multivariate Elastic Net models
+
+Mutations observed in at least {summary['regression_min_frequency']} variants were included as predictors. Features were standardized within the modeling pipeline. Elastic Net combines L1 sparsity with L2 shrinkage:
+
+```text
+penalty(beta) = lambda × [alpha × sum(|beta|)
+                         + (1-alpha)/2 × sum(beta²)]
+```
+
+The classification model minimized logistic loss plus this penalty and predicted active/inactive fluorescence. The regression model minimized squared error plus the same type of penalty and predicted log10 fluorescence.
+
+Evaluation used nested cross-validation:
+
+1. Split the data into five outer folds.
+2. Within each outer training set, use three-fold cross-validation to choose regularization strength and L1/L2 mixing.
+3. Fit the selected model on that outer training set.
+4. Predict the untouched outer test fold.
+5. Pool the five out-of-fold predictions and calculate ROC-AUC, R², and Spearman correlation.
+
+This prevents the test fold from influencing hyperparameter selection. Final coefficient rankings come from a separately tuned descriptive model fitted to the full dataset; predictive performance comes only from out-of-fold predictions.
+
 ## Main findings
 
 ### Individual mutations
