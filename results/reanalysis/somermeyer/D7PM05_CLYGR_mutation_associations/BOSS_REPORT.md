@@ -126,6 +126,40 @@ Evaluation used nested cross-validation:
 
 This prevents the test fold from influencing hyperparameter selection. Final coefficient rankings come from a separately tuned descriptive model fitted to the full dataset; predictive performance comes only from out-of-fold predictions.
 
+### 7. What “out-of-fold prediction” means
+
+We did **not** fit a model on all variants and then evaluate it on those same variants. Instead, every reported prediction was made for a variant that was excluded from that model's training data.
+
+The five outer folds were used as follows:
+
+| Outer run | Model training data | Untouched test data |
+|---:|---|---|
+| 1 | Folds 2–5 (about 80%) | Fold 1 (about 20%) |
+| 2 | Folds 1 and 3–5 | Fold 2 |
+| 3 | Folds 1–2 and 4–5 | Fold 3 |
+| 4 | Folds 1–3 and 5 | Fold 4 |
+| 5 | Folds 1–4 | Fold 5 |
+
+For each run, the inner three-fold cross-validation used only that run's 80% training portion to choose Elastic Net hyperparameters. The outer 20% test fold remained untouched until the selected model made its final predictions.
+
+After all five runs, every variant had exactly one prediction from a model that had not trained on it. We pooled those five held-out prediction sets and calculated ROC-AUC, R², and Spearman rho. This provides a substantially more realistic performance estimate than scoring the training data.
+
+### 8. How to interpret the model metrics and figure
+
+**ROC-AUC belongs to the active/inactive logistic model.** It is the probability that a randomly selected active variant receives a higher predicted activity score than a randomly selected inactive variant. An ROC-AUC of 0.5 is random ranking and 1.0 is perfect ranking. ROC-AUC is not the percentage of correctly classified variants and does not by itself show whether predicted probabilities are calibrated.
+
+**R² and Spearman rho belong to the continuous linear model.** R² measures how much held-out variance in log10 fluorescence is explained. Spearman measures whether the model ranks variants in approximately the correct fluorescence order.
+
+In `elastic_net_regression.png`:
+
+- Each point in the left panel is one variant.
+- The x-axis is observed log10 fluorescence.
+- The y-axis is its out-of-fold predicted log10 fluorescence.
+- Perfect predictions would lie on the diagonal \(predicted=observed\). The upward trend reflects useful prediction; the compressed prediction range shows shrinkage toward the mean and weaker recovery of extreme values.
+- The right panel contains coefficients from a final descriptive model fitted to all variants after evaluation. A negative coefficient pushes predicted fluorescence downward when that mutation is present; a positive coefficient pushes it upward. Larger absolute values indicate stronger conditional contributions on the standardized feature scale.
+
+The coefficient model is useful for ranking candidate mutations, whereas the out-of-fold predictions are what support claims about predictive performance.
+
 ## Main findings
 
 ### Individual mutations
@@ -149,6 +183,8 @@ We tested **630,003 mutation pairs** among 1,123 substitutions observed at least
 - Active/inactive Elastic Net ROC-AUC: **0.962**
 - Continuous log10-fluorescence Elastic Net R²: **0.601**
 - Continuous prediction Spearman ρ: **0.848**
+
+The ROC-AUC of **0.962** means that, across held-out predictions, an active variant is assigned a higher activity score than an inactive variant approximately **96.2% of the time**. It does not mean that 96.2% of variants were classified correctly.
 
 ![Elastic Net out-of-fold predictions and coefficients](elastic_net_regression.png)
 
