@@ -9,6 +9,7 @@ MIF,50,99,99,True,True
 MIFST,50,99,99,True,True
 MULAN_small,50,99,99,True,True
 ProSST-1024,50,99,99,True,True
+ProtSSN_k30_h1280,50,99,99,True,True
 SaProt_35M_AF2,50,99,99,True,True
 VESPA,50,99,0,True,False
 VESPAl,50,99,0,True,False

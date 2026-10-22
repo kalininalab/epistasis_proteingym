@@ -16,7 +16,7 @@ SUMMARY=BASE/"best_models_fitted_epistasis/model_summary.csv"
 ROOTS=[
  BASE/"multimodel_mm_pll/fits", BASE/"carp_mm_pll/fits",
  BASE/"modern_esm_mm_pll/full", BASE/"structure_plm_mm_pll/full",
- BASE/"next_sitewise_mm_pll/full", BASE/"vespa_family/fits", BASE/"vespa_family/vespa_full/fits",
+ BASE/"next_sitewise_mm_pll/full", BASE/"protssn_mm_pll/full", BASE/"vespa_family/fits", BASE/"vespa_family/vespa_full/fits",
 ]
 
 def short_ds(x): return x.replace("_Tsuboyama_2023_"," ").replace("_Tsuboyama_2023","")
@@ -102,6 +102,14 @@ def main():
  # Counts above include both subsets, so a complete method has 100 rows.
  coverage["complete_conditional_50"]=coverage.conditional_assays.ge(99);coverage["complete_pll_50"]=coverage.pll_assays.ge(99);coverage.to_csv(OUT/"recomputed_model_coverage.csv",index=False)
  new.to_csv(OUT/"recomputed_per_assay_metrics.csv",index=False)
+ metric_cols={"conditional_mm":"rho_conditional_fitted_epistasis","pll":"rho_PLL_fitted_epistasis"}
+ rows=[]
+ for model_key,g in new.groupby("model_key"):
+  for subset,sg in g.groupby("subset"):
+   for method,col in metric_cols.items():
+    values=sg[col].dropna()
+    rows.append(dict(model_key=model_key,subset=subset,method=method,assays=len(values),mean_rho=values.mean(),median_rho=values.median()))
+ pd.DataFrame(rows).to_csv(OUT/"model_method_summary.csv",index=False)
  (OUT/"README.md").write_text("""# Updated best-model epistasis heatmaps
 
 Six separate heatmaps compare three scoring procedures on all double mutants and on the predefined epistatic subset:
@@ -119,6 +127,7 @@ Each cell is Spearman correlation between predicted and experimental thermodynam
 - Conditional MM is consistently more informative for fitted epistasis than PLL across the completed models.
 - ESM3 has the strongest mean conditional-MM correlation: 0.217 across all doubles and 0.334 on the predefined epistatic subset.
 - ESMC-300M ranks second: 0.175 and 0.295, respectively.
+- ProtSSN conditional MM reaches mean rho 0.121 across all doubles and 0.168 on the epistatic subset; its fitted PLL correlations are approximately zero on average.
 - The best mean PLL result is much smaller: ESM3 reaches 0.035 across all doubles and 0.040 on the epistatic subset.
 
 Reproduce with:

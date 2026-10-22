@@ -15,11 +15,11 @@ Each cell is Spearman correlation between predicted and experimental thermodynam
 - Conditional MM is consistently more informative for fitted epistasis than PLL across the completed models.
 - ESM3 has the strongest mean conditional-MM correlation: 0.217 across all doubles and 0.334 on the predefined epistatic subset.
 - ESMC-300M ranks second: 0.175 and 0.295, respectively.
+- ProtSSN conditional MM reaches mean rho 0.121 across all doubles and 0.168 on the epistatic subset; its fitted PLL correlations are approximately zero on average.
 - The best mean PLL result is much smaller: ESM3 reaches 0.035 across all doubles and 0.040 on the epistatic subset.
 
 Reproduce with:
 
 ```bash
-/nethome/akolchina/miniconda3/envs/protease-pipeline/bin/python \
-  scripts/reanalysis/best_models_epistasis/plot_updated_three_scores.py
+/nethome/akolchina/miniconda3/envs/protease-pipeline/bin/python   scripts/reanalysis/best_models_epistasis/plot_updated_three_scores.py
 ```
